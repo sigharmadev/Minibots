@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -50,4 +52,14 @@ public class Constants {
             default -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
         };
     }    
+
+    
+    public static class FieldConstants {
+        public static final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    }
+
+    
+    public static class DriveConstants {
+        public static final double slowModeJoystickMultiplier = 0.4;
+    }
 }
