@@ -1,11 +1,19 @@
 package frc.robot.subsystems.test;
 
+import static edu.wpi.first.units.Units.RPM;
+
 import org.littletonrobotics.junction.Logger;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SparkMax extends SubsystemBase {
     private final TestSparkMaxIO io;
-    public final TestSparkIOInputs inputs= new TestSparkIOInputs();
+    public final TestSparkIOInputsAutoLogged inputs= new TestSparkIOInputsAutoLogged();
 
     public SparkMax(TestSparkMaxIO io) {
         this.io = io;
@@ -17,7 +25,15 @@ public class SparkMax extends SubsystemBase {
         Logger.recordOutput("Test/MotorRPMSetPoint", TestSparkMaxConstants.velocitySetpoint);
     }
 
-    public void test() {
-        io.test();
+    public void test(AngularVelocity velocity) {
+        io.test(velocity);
+    }
+
+    public void runVelocitySetpoint() {
+        test(TestSparkMaxConstants.velocitySetpoint);
+    }
+
+    public Command testCommand() {
+        return Commands.run(() -> runVelocitySetpoint(), this);
     }
 }
