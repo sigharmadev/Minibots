@@ -32,8 +32,7 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
         cimConfig.closedLoop.
         p(TestSparkMaxConstants.kP)
         .i(TestSparkMaxConstants.kI)
-        .d(TestSparkMaxConstants.kD)
-        .outputRange(-10.0, 10.0);   
+        .d(TestSparkMaxConstants.kD);
 
         cimConfig.closedLoop.feedForward.
         kS(TestSparkMaxConstants.kS)
@@ -53,6 +52,10 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
     @Override
     public void test(AngularVelocity velocity){
         cimController.setSetpoint(velocity.in(RPM), ControlType.kVelocity);
+    }
+    @Override
+    public void bypass(){
+        cim.set(1.0);
     }
 
     @Override 

@@ -1,38 +1,57 @@
 package frc.robot.subsystems.test;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class SparkMaxSimIO extends MotorIOSparkMax {
-    DCMotor maxGearBox;
-    SparkMaxSim maxSim;
+    private final DCMotorSim motorSim;
+    private final SparkMaxSim sparkSim;
 
-    public SparkMaxSimIO(int CanID) {
-        super(CanID);
-        maxGearBox = new DCMotor(12, 1.47, 9.2, 0.25,  Units.rotationsPerMinuteToRadiansPerSecond(6000), 1);
-        maxSim = new SparkMaxSim(cim, maxGearBox);
+    public SparkMaxSimIO(int canID) {
+        super(canID);
+        motorSim = new DCMotorSim( LinearSystemId.createDCMotorSystem(
+            DCMotor.getCIM(1),
+            TestSparkMaxConstants.GearRatio,
+            TestSparkMaxConstants.MOI),
+            DCMotor.getCIM(1)
+        );
+
+        sparkSim = new SparkMaxSim(cim,DCMotor.getCIM(1)
+        );
     }
-    
+
     @Override
-    public void updateInputs(TestSparkIOInputs inputs){
-        maxSim.iterate(
-            Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-                maxSim.getVelocity()),
-            RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-            0.02); // Time interval, in Seconds
+    public void updateInputs(TestSparkIOInputs inputs) {
+        double appliedVolts = cim.getAppliedOutput() * RobotController.getBatteryVoltage();
 
-        // SimBattery estimates loaded battery voltages
-        // This should include all motors being simulated
-        RoboRioSim.setVInVoltage(
-            BatterySim.calculateDefaultBatteryLoadedVoltage(maxSim.getMotorCurrent()));
+        motorSim.setInputVoltage(appliedVolts);
+        motorSim.update(0.02);
 
+        double velocityRPM = Units.radiansPerSecondToRotationsPerMinute(
+            motorSim.getAngularVelocityRadPerSec()
+        );
+
+        sparkSim.iterate(
+            velocityRPM,
+            RobotController.getBatteryVoltage(),
+            0.02
+        );
+        inputs.appliedOutput = cim.getAppliedOutput();
+        inputs.busVoltage = Volts.of(RobotController.getBatteryVoltage());
+        inputs.appliedVolts = Volts.of(appliedVolts);
+        inputs.simVelocity = RPM.of(velocityRPM);
+        inputs.simCurrent = Amps.of(motorSim.getCurrentDrawAmps());
         super.updateInputs(inputs);
     }
 }
+
+  
