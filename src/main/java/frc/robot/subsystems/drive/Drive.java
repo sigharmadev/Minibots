@@ -4,145 +4,118 @@
 
 package frc.robot.subsystems.drive;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.LoggedTracer;
 
 /** Represents a mecanum drive style drivetrain. */
-public class Drive {
+public class Drive extends SubsystemBase{
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final PWMSparkMax m_frontLeftMotor = new PWMSparkMax(1);
-  private final PWMSparkMax m_frontRightMotor = new PWMSparkMax(2);
-  private final PWMSparkMax m_backLeftMotor = new PWMSparkMax(3);
-  private final PWMSparkMax m_backRightMotor = new PWMSparkMax(4);
+  // These Constants should be the same for every drivebase, so just use the comp bot constants.
+  static final double ODOMETRY_FREQUENCY = CompTunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
+  public final double DRIVE_BASE_RADIUS;
 
-  private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
-  private final Encoder m_frontRightEncoder = new Encoder(2, 3);
-  private final Encoder m_backLeftEncoder = new Encoder(4, 5);
-  private final Encoder m_backRightEncoder = new Encoder(6, 7);
+  // Gyro degrees-per-rotation correction/trim
+  static final double GYRO_YAW_DEG_PER_ROT_CORRECTION = -0.97;
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+  // These constants should change for every drivebase
+  private final LinearVelocity SPEED_12_VOLTS;
+  private final RobotConfig PP_CONFIG;
+    
+  // PathPlanner config constants
+  private static final double ROBOT_MASS_KG = 65.7709;
+  private static final double ROBOT_MOI = 6.33;
+  private static final double WHEEL_COF = 1.2;
 
-  private final PIDController m_frontLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_frontRightPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backLeftPIDController = new PIDController(1, 0, 0);
-  private final PIDController m_backRightPIDController = new PIDController(1, 0, 0);
+  private final GyroIO gyro;
+  private final GyroIOInputsAutoLogged gyroInputs= new GyroIOInputsAutoLogged();
+  private final MecanumDriveKinematics kinematics;
+    private MecanumDriveOdometry odometry;
+  private Rotation2d gyroRotation= Rotation2d.kZero;
+  static final Lock odometryLock = new ReentrantLock();
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
-
-  private final MecanumDriveKinematics m_kinematics =
-      new MecanumDriveKinematics(
-          m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-
-  private final MecanumDriveOdometry m_odometry =
-      new MecanumDriveOdometry(m_kinematics, m_gyro.getRotation2d(), getCurrentDistances());
-
-  // Gains are for example purposes only - must be determined for your own robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final Mecanum mecanum[] = new Mecanum[4];
 
   /** Constructs a MecanumDrive and resets the gyro. */
-  public Drive() {
-    m_gyro.reset();
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    m_frontRightMotor.setInverted(true);
-    m_backRightMotor.setInverted(true);
+  public Drive(GyroIO gyro) {
+    this.gyro= gyro;
+    mecanum[0]= new Mecanum(new MecanumHardwareIO(0));
+    mecanum[1]= new Mecanum(new MecanumHardwareIO(1));
+    mecanum[2]= new Mecanum(new MecanumHardwareIO(2));
+    mecanum[3]= new Mecanum(new MecanumHardwareIO(3));
+
+    Translation2d[] wheelLocations= getWheelLocations();
+    kinematics= new MecanumDriveKinematics(wheelLocations[0], wheelLocations[1],
+    wheelLocations[2], wheelLocations[3]);
+
+    odometry= new MecanumDriveOdometry(kinematics, gyroRotation, 
+    new MecanumDriveWheelPositions(mecanum[0].getWheelPositions(), mecanum[1].getWheelPositions(),
+    mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions()), 
+    Pose2d.kZero);
+  }
+  
+  @Override
+  public void periodic(){
+    LoggedTracer.reset();
+    gyro.updateInputs(gyroInputs);
+    Logger.process(gyroInputs);
+
+    for(var i=0; i<4; i++){
+      mecanum[i].periodic();
+    }
+
+    if(DriverStation.isDisabled()){
+      for(var i=0; i<4; i++){
+        mecanum[i].stop();
+      }
+    }
+
+    //Getting new wheel positions
+    var lastWheels= new MecanumDriveWheelPositions(mecanum[0].getWheelPositions(), mecanum[1].getWheelPositions(),
+    mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions());
+    //Getting new gyro rotation
+    gyroRotation= gyroInputs.yawPosition;
+    //Updating robot pose
+    var robotPose= odometry.update(gyroRotation, lastWheels);
   }
 
-  /**
-   * Returns the current state of the drivetrain.
-   *
-   * @return The current state of the drivetrain.
-   */
-  public MecanumDriveWheelSpeeds getCurrentState() {
-    return new MecanumDriveWheelSpeeds(
-        m_frontLeftEncoder.getRate(),
-        m_frontRightEncoder.getRate(),
-        m_backLeftEncoder.getRate(),
-        m_backRightEncoder.getRate());
+  public void runVelocity(ChassisSpeeds speeds){
+    ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
+    MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
+
+    for(var i=0; i<4; i++){
+      mecanum[i].runVelocity(wheelSpeeds);
+    }
   }
 
-  /**
-   * Returns the current distances measured by the drivetrain.
-   *
-   * @return The current distances measured by the drivetrain.
-   */
-  public MecanumDriveWheelPositions getCurrentDistances() {
-    return new MecanumDriveWheelPositions(
-        m_frontLeftEncoder.getDistance(),
-        m_frontRightEncoder.getDistance(),
-        m_backLeftEncoder.getDistance(),
-        m_backRightEncoder.getDistance());
-  }
-
-  /**
-   * Set the desired speeds for each wheel.
-   *
-   * @param speeds The desired wheel speeds.
-   */
-  public void setSpeeds(MecanumDriveWheelSpeeds speeds) {
-    final double frontLeftFeedforward = m_feedforward.calculate(speeds.frontLeftMetersPerSecond);
-    final double frontRightFeedforward = m_feedforward.calculate(speeds.frontRightMetersPerSecond);
-    final double backLeftFeedforward = m_feedforward.calculate(speeds.rearLeftMetersPerSecond);
-    final double backRightFeedforward = m_feedforward.calculate(speeds.rearRightMetersPerSecond);
-
-    final double frontLeftOutput =
-        m_frontLeftPIDController.calculate(
-            m_frontLeftEncoder.getRate(), speeds.frontLeftMetersPerSecond);
-    final double frontRightOutput =
-        m_frontRightPIDController.calculate(
-            m_frontRightEncoder.getRate(), speeds.frontRightMetersPerSecond);
-    final double backLeftOutput =
-        m_backLeftPIDController.calculate(
-            m_backLeftEncoder.getRate(), speeds.rearLeftMetersPerSecond);
-    final double backRightOutput =
-        m_backRightPIDController.calculate(
-            m_backRightEncoder.getRate(), speeds.rearRightMetersPerSecond);
-
-    m_frontLeftMotor.setVoltage(frontLeftOutput + frontLeftFeedforward);
-    m_frontRightMotor.setVoltage(frontRightOutput + frontRightFeedforward);
-    m_backLeftMotor.setVoltage(backLeftOutput + backLeftFeedforward);
-    m_backRightMotor.setVoltage(backRightOutput + backRightFeedforward);
-  }
-
-  /**
-   * Method to drive the robot using joystick info.
-   *
-   * @param xSpeed Speed of the robot in the x direction (forward).
-   * @param ySpeed Speed of the robot in the y direction (sideways).
-   * @param rot Angular rate of the robot.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
-  public void drive(
-      double xSpeed, double ySpeed, double rot, boolean fieldRelative, double periodSeconds) {
-    var mecanumDriveWheelSpeeds =
-        m_kinematics.toWheelSpeeds(
-            ChassisSpeeds.discretize(
-                fieldRelative
-                    ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                    : new ChassisSpeeds(xSpeed, ySpeed, rot),
-                periodSeconds));
-    mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
-    setSpeeds(mecanumDriveWheelSpeeds);
-  }
-
-  /** Updates the field relative position of the robot. */
-  public void updateOdometry() {
-    m_odometry.update(m_gyro.getRotation2d(), getCurrentDistances());
+  
+  public Translation2d[] getWheelLocations(){
+    return new Translation2d[]{
+      MecanumConstants.FrontLeft,
+      MecanumConstants.FrontRight,
+      MecanumConstants.BackLeft,
+      MecanumConstants.BackRight
+    };
   }
 }
