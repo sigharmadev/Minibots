@@ -2,6 +2,10 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+
+import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
@@ -12,14 +16,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class MecanumHardwareIO implements MecanumIO {
     SparkMax motor;
     SparkClosedLoopController motorController;
     RelativeEncoder motorEncoder;
+    private AngularVelocity velocityDebug=RPM.of(0);
 
-    public MecanumHardwareIO(int CanID) {
+    public MecanumHardwareIO(int CanID, boolean motorInverted) {
         motor= new SparkMax(CanID, MotorType.kBrushed);
         motorController= motor.getClosedLoopController();
         motorEncoder = motor.getEncoder();
@@ -44,14 +50,17 @@ public class MecanumHardwareIO implements MecanumIO {
         .maxAcceleration(MecanumConstants.acceleration)
         .allowedProfileError(MecanumConstants.allowedProfileError);
 
-        cimConfig.smartCurrentLimit(60);
+        cimConfig.smartCurrentLimit(9);
+
+        cimConfig.inverted(motorInverted);
         
         motor.configure(cimConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
-    public void test(AngularVelocity velocity){
-        motorController.setSetpoint(velocity.in(RPM), ControlType.kVelocity);
+    public void runVelocity(AngularVelocity velocity){
+        Logger.recordOutput("DebugDevVelocity", velocity);
+        motorController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
     }
     @Override
     public void bypass(){
@@ -60,7 +69,8 @@ public class MecanumHardwareIO implements MecanumIO {
 
     @Override 
     public void updateInputs(MecanumIOInputs inputs) {
-        inputs.motorRPM = RPM.of(motorEncoder.getVelocity());
-        inputs.motorCurrent = Amps.of(motor.getOutputCurrent());
+        inputs.driveAngleRots= motorEncoder.getPosition();
+        inputs.driveRotsVelocity= motorEncoder.getVelocity();
+        inputs.driveCurrent= Amps.of(motor.getOutputCurrent());
     }
 }

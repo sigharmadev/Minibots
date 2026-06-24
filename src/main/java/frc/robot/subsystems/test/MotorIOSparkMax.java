@@ -3,6 +3,8 @@ package frc.robot.subsystems.test;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -44,18 +46,18 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
         .maxAcceleration(TestSparkMaxConstants.acceleration)
         .allowedProfileError(TestSparkMaxConstants.allowedProfileError);
 
-        cimConfig.smartCurrentLimit(60);
-        
+        cimConfig.smartCurrentLimit(9);
+         
         cim.configure(cimConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void test(AngularVelocity velocity){
-        cimController.setSetpoint(velocity.in(RPM), ControlType.kVelocity);
+        cimController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
     }
     @Override
     public void bypass(){
-        cim.set(1.0);
+        cim.set(0.2);
     }
 
     @Override 

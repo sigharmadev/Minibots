@@ -19,6 +19,7 @@ public class SparkMax extends SubsystemBase {
         this.io = io;
     }
 
+    @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Test", inputs);
@@ -37,7 +38,11 @@ public class SparkMax extends SubsystemBase {
         test(TestSparkMaxConstants.velocitySetpoint);
     }
 
+    public void stop() {
+        io.test(RPM.of(0));
+    }
+
     public Command testCommand() {
-        return Commands.run(() -> runVelocitySetpoint(), this);
+        return Commands.startEnd(() -> runVelocitySetpoint(), this::stop);
     }
 }

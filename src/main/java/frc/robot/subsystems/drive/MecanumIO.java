@@ -1,31 +1,28 @@
-package frc.robot.subsystems.test;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-public interface TestSparkMaxIO {
+public interface MecanumIO {
     @AutoLog
-
-    public static class TestSparkIOInputs{
-        public Current motorCurrent = Amps.zero();
-        public AngularVelocity motorRPM = edu.wpi.first.units.Units.RPM.zero();
-
-        public double appliedOutput = 0.0;
-        public Voltage busVoltage = Volts.zero();
-        public Voltage appliedVolts = Volts.zero();
-        public AngularVelocity simVelocity = edu.wpi.first.units.Units.RPM.zero();
-        public Current simCurrent = Amps.zero();
+    public static class MecanumIOInputs{
+        public double driveRotsVelocity= 0.0;
+        public double driveAngleRots= 0.0;
+        public Current driveCurrent= Amps.of(0);
     }
 
-    public default void updateInputs(TestSparkIOInputs inputs) {}
+    public default void updateInputs(MecanumIOInputs inputs) {}
 
-    public default void test(AngularVelocity velocity) {}
+    public default void runVelocity(AngularVelocity velocity) {}
 
     public default void bypass(){}
 }

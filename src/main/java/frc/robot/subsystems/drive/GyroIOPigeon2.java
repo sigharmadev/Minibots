@@ -27,8 +27,6 @@ import edu.wpi.first.units.measure.Angle;
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon;
-  private final Queue<Double> yawPositionQueue;
-  private final Queue<Double> yawTimestampQueue;
   private final StatusSignal<Angle> yaw;
 
   public GyroIOPigeon2(int Pigeon2Id, CANBus bus) {
@@ -37,24 +35,13 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw = pigeon.getYaw();
 
     pigeon.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
+    //yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
     pigeon.optimizeBusUtilization();
-    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = BaseStatusSignal.refreshAll(yaw).equals(StatusCode.OK);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
-
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
   }
 }

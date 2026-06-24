@@ -1,26 +1,35 @@
-package frc.robot.subsystems.test;
+package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RPM;
+
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public class TestSparkMaxConstants {
-    public static final int CIM_MOTOR_ID = 2;
-    public static final int ENCODER_COUNTS_PER_REVOLUTION = 8192;
-    public static final boolean ENCODER_INVERTED = true;
+public class MecanumConstants {
+    public static final int ENCODER_COUNTS_PER_REVOLUTION = 2150;
+    public static final boolean ENCODER_INVERTED = false;
 
-    public static final double kP= 1.0;
-    public static final double kI= 0.01;
-    public static final double kD= 0.001;
-    public static final double kS= 0.0;
-    public static final double kV= 0.1;
+    //Change these for later when tuning
+    public static final double kP= 0.001; 
+    public static final double kI= 0.0;
+    public static final double kD= 0.0;
+    public static final double kS= 0.01;
+    public static final double kV= 0.001;
     public static final double kA= 0.0;
 
-    public static final AngularVelocity velocitySetpoint= RPM.of(500.0); //RPM
-
-    public static final double cruiseVelocity= 10000;
-    public static final double acceleration= 20000; //RPM/s
-    public static final double allowedProfileError= 3.0; //RPM
+    public static final double cruiseVelocity= 75;
+    public static final double acceleration= 100; //RPM/s
+    public static final double allowedProfileError= 5.0; //RPM
 
     public static final double MOI= 0.001;
-    public static final double GearRatio= 1.0;
+    public static final double DriveGearRatio= 1.0; //might need to change
+    public static final double wheelRadius=0.048; //definitely need to change
+
+    //Change these later
+    public static final Translation2d FrontLeft= new Translation2d(0.381, 0.381);
+    public static final Translation2d FrontRight= new Translation2d(0.381, -0.381);
+    public static final Translation2d BackLeft= new Translation2d(-0.381, 0.381);
+    public static final Translation2d BackRight= new Translation2d(-0.381,-0.381);  
+
+    public static final double maxLinearSpeedMetersPerSecond= 1.0;
 }

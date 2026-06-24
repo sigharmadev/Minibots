@@ -17,36 +17,41 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Mecanum extends SubsystemBase {
     private final MecanumIO io;
     public final MecanumIOInputsAutoLogged inputs= new MecanumIOInputsAutoLogged();
+    private final String name;
 
-    public Mecanum(MecanumIO io) {
+    public Mecanum(MecanumIO io, String name) {
         this.io = io;
+        this.name= name;
     }
 
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("Test", inputs);
+        Logger.processInputs("Mecanum/" + name, inputs);
     }
 
     public void setVelocity(AngularVelocity velocity) {
         io.runVelocity(velocity);
     }
 
-    public void setSetpoint(MecanumDriveWheelSpeeds speeds){
-        double driveRads= (speeds/(MecanumConstants.wheelRadius)).getValueAsDouble();
-        setVelocity(RotationsPerSecond.of(driveRads));
+    public void setSetpoint(double speeds){
+        double driveRads= speeds/(MecanumConstants.wheelRadius);
+        double driveRPM= (driveRads/(2.0 * Math.PI))*60;
+        //Drive.debug= 1000;
+        //Logger.recordOutput("DebugDev", Drive.debug);
+        setVelocity(RPM.of(driveRPM));
     }
 
-    public Command runVelocity(MecanumDriveWheelSpeeds speeds){
-        return Commands.run(()-> setSetpoint(speeds));
+    public Command runVelocity(double speed){
+        return Commands.run(()-> setSetpoint(speed));
     }
 
     public double getWheelPositions(){
-        double positionMeters= inputs.driveAngleRads*MecanumConstants.wheelRadius;
+        double positionMeters= inputs.driveAngleRots*2*MecanumConstants.wheelRadius*Math.PI;
         return positionMeters;
     }
 
     public void stop(){
-        setVelocity(RotationsPerSecond.of(0));
+        setVelocity(RPM.of(0));
     }
     
 }
