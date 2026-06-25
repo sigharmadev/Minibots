@@ -24,44 +24,46 @@ public class MecanumHardwareIO implements MecanumIO {
     SparkClosedLoopController motorController;
     RelativeEncoder motorEncoder;
     private AngularVelocity velocityDebug=RPM.of(0);
+    private int inputsDebug= 0;
 
     public MecanumHardwareIO(int CanID, boolean motorInverted) {
         motor= new SparkMax(CanID, MotorType.kBrushed);
         motorController= motor.getClosedLoopController();
         motorEncoder = motor.getEncoder();
 
-        SparkMaxConfig cimConfig= new SparkMaxConfig();
+        SparkMaxConfig motorConfig= new SparkMaxConfig();
 
-        cimConfig.encoder.countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION)
+        motorConfig.encoder.countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION)
         .inverted(MecanumConstants.ENCODER_INVERTED);
 
-        cimConfig.closedLoop.
+        motorConfig.closedLoop.
         p(MecanumConstants.kP)
         .i(MecanumConstants.kI)
         .d(MecanumConstants.kD);
 
-        cimConfig.closedLoop.feedForward.
+        motorConfig.closedLoop.feedForward.
         kS(MecanumConstants.kS)
         .kV(MecanumConstants.kV)
         .kA(MecanumConstants.kA);
 
-        cimConfig.closedLoop.maxMotion.
+        motorConfig.closedLoop.maxMotion.
         cruiseVelocity(MecanumConstants.cruiseVelocity)
         .maxAcceleration(MecanumConstants.acceleration)
         .allowedProfileError(MecanumConstants.allowedProfileError);
 
-        cimConfig.smartCurrentLimit(9);
+        motorConfig.smartCurrentLimit(9);
 
-        cimConfig.inverted(motorInverted);
+        motorConfig.inverted(motorInverted);
         
-        motor.configure(cimConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
+        motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }   
 
     @Override
     public void runVelocity(AngularVelocity velocity){
         Logger.recordOutput("DebugDevVelocity", velocity);
         motorController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
     }
+    
     @Override
     public void bypass(){
         motor.set(1.0);
@@ -69,7 +71,9 @@ public class MecanumHardwareIO implements MecanumIO {
 
     @Override 
     public void updateInputs(MecanumIOInputs inputs) {
-        inputs.driveAngleRots= motorEncoder.getPosition();
+        inputsDebug= 50;
+        Logger.recordOutput("InputsDevDebug", inputsDebug);
+        inputs.driveAngleRots= 10.0;
         inputs.driveRotsVelocity= motorEncoder.getVelocity();
         inputs.driveCurrent= Amps.of(motor.getOutputCurrent());
     }

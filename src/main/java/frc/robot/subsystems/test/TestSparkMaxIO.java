@@ -15,12 +15,6 @@ public interface TestSparkMaxIO {
     public static class TestSparkIOInputs{
         public Current motorCurrent = Amps.zero();
         public double motorRPM = 0.0;
-
-        public double appliedOutput = 0.0;
-        public Voltage busVoltage = Volts.zero();
-        public Voltage appliedVolts = Volts.zero();
-        public AngularVelocity simVelocity = edu.wpi.first.units.Units.RPM.zero();
-        public Current simCurrent = Amps.zero();
     }
 
     public default void updateInputs(TestSparkIOInputs inputs) {}

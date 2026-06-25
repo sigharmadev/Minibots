@@ -14,9 +14,7 @@ public class MecanumSimIO extends MecanumHardwareIO {
     private final SparkMaxSim sparkSim;
 
     // Use a 540/775-sized brushed motor profile to match the goBILDA core physics
-    private static final DCMotor goBildaCore = DCMotor.getAndymark9015(1);
-    // Combine your internal 19.2 planetary ratio with your external ratio
-    private static final double totalGearRatio = 19.2 * MecanumConstants.DriveGearRatio;
+    private static final DCMotor goBildaCore = new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1);
 
     public MecanumSimIO(int canID, boolean motorInverted) {
         // Pass to hardware class constructor (initializes your SparkMax reference)
@@ -24,9 +22,8 @@ public class MecanumSimIO extends MecanumHardwareIO {
 
         motorSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                goBildaCore, 
-                totalGearRatio, 
-                MecanumConstants.MOI
+                goBildaCore, MecanumConstants.MOI,
+                MecanumConstants.DriveGearRatio
             ),
             goBildaCore
         );
@@ -50,14 +47,7 @@ public class MecanumSimIO extends MecanumHardwareIO {
 
         // 4. Update the REV Simulation wrapper so internal PID algorithms work
         sparkSim.iterate(motorShaftVelocityRPM, RobotController.getBatteryVoltage(), 0.02);
-
-        // 5. Calculate what the ENCODER sees at the output shaft (divided by gearbox)
-        double outputShaftVelocityRPM = motorShaftVelocityRPM / 19.2;
         
-        // 6. Directly fill your AdvantageKit inputs with simulated physics data
-        inputs.driveRotsVelocity = outputShaftVelocityRPM;
-        // Integrate velocity over time (20ms loop) to update simulated position
-        inputs.driveAngleRots += (outputShaftVelocityRPM / 60.0) * 0.02;
-        inputs.driveCurrent = Amps.of(motorSim.getCurrentDrawAmps());
+        super.updateInputs(inputs);
     }
 }

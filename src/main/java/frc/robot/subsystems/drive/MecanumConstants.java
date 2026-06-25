@@ -21,7 +21,7 @@ public class MecanumConstants {
     public static final double acceleration= 100; //RPM/s
     public static final double allowedProfileError= 5.0; //RPM
 
-    public static final double MOI= 0.001;
+    public static final double MOI= 0.01;
     public static final double DriveGearRatio= 1.0; //might need to change
     public static final double wheelRadius=0.048; //definitely need to change
 

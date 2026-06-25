@@ -45,11 +45,6 @@ public class SparkMaxSimIO extends MotorIOSparkMax {
             RobotController.getBatteryVoltage(),
             0.02
         );
-        inputs.appliedOutput = cim.getAppliedOutput();
-        inputs.busVoltage = Volts.of(RobotController.getBatteryVoltage());
-        inputs.appliedVolts = Volts.of(appliedVolts);
-        inputs.simVelocity = RPM.of(velocityRPM);
-        inputs.simCurrent = Amps.of(motorSim.getCurrentDrawAmps());
         super.updateInputs(inputs);
     }
 }

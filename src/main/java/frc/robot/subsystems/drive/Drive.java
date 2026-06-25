@@ -86,16 +86,16 @@ public class Drive extends SubsystemBase{
 
     Logger.recordOutput("Wheel/Setpoint", RPM.of(500));
 
-    for(var i=0; i<4; i++){
+    /*for(var i=0; i<4; i++){
       mecanum[i].periodic();
-    }
+    }*/
 
-    if(DriverStation.isDisabled()){
+    /*  if(DriverStation.isDisabled()){
       for(var i=0; i<4; i++){
         mecanum[i].stop();
       }
     }
-
+    */
     Logger.recordOutput("DebugDev", debug);
 
     //Getting new wheel positions
@@ -119,7 +119,7 @@ public class Drive extends SubsystemBase{
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
     MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
 
-    wheelSpeeds.desaturate(1.5);
+    wheelSpeeds.desaturate(MecanumConstants.maxLinearSpeedMetersPerSecond);
     //debug=200;
     mecanum[0].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
     mecanum[1].setSetpoint(wheelSpeeds.frontRightMetersPerSecond);

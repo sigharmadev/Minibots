@@ -53,5 +53,4 @@ public class Mecanum extends SubsystemBase {
     public void stop(){
         setVelocity(RPM.of(0));
     }
-    
 }
