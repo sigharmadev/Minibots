@@ -30,8 +30,11 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.RobotType;
 import frc.robot.generated.CompTunerConstants;
 import frc.robot.util.LoggedTracer;
+
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drive extends SubsystemBase{
@@ -50,12 +53,20 @@ public class Drive extends SubsystemBase{
   private final Mecanum mecanum[] = new Mecanum[4];
 
   /** Constructs a MecanumDrive and resets the gyro. */
-  public Drive(/*GyroIO gyro*/) {
+  public Drive(/*GyroIO gyro*/ ) {
     //this.gyro= gyro;
-    mecanum[0]= new Mecanum(new MecanumHardwareIO(1, false), "FrontLeft");
-    mecanum[1]= new Mecanum(new MecanumHardwareIO(2, true), "FrontRight");
-    mecanum[2]= new Mecanum(new MecanumHardwareIO(3, false), "BackLeft");
-    mecanum[3]= new Mecanum(new MecanumHardwareIO(4, true), "BackRight");
+
+    if(Constants.getRobot()== RobotType.COMPETITION){
+      mecanum[0]= new Mecanum(new MecanumHardwareIO(1, false), "FrontLeft");
+      mecanum[1]= new Mecanum(new MecanumHardwareIO(2, true), "FrontRight");
+      mecanum[2]= new Mecanum(new MecanumHardwareIO(3, false), "BackLeft");
+      mecanum[3]= new Mecanum(new MecanumHardwareIO(4, true), "BackRight");
+    } else if(Constants.getRobot()==RobotType.SIMBOT){
+      mecanum[0]= new Mecanum(new MecanumSimIO(1, false), "FrontLeft");
+      mecanum[1]= new Mecanum(new MecanumSimIO(2, true), "FrontRight");
+      mecanum[2]= new Mecanum(new MecanumSimIO(3, false), "BackLeft");
+      mecanum[3]= new Mecanum(new MecanumSimIO(4, true), "BackRight");
+    }
 
     Translation2d[] wheelLocations= getWheelLocations();
     kinematics= new MecanumDriveKinematics(wheelLocations[0], wheelLocations[1],
