@@ -19,13 +19,13 @@ public class SparkMaxSimIO extends MotorIOSparkMax {
     public SparkMaxSimIO(int canID) {
         super(canID);
         motorSim = new DCMotorSim( LinearSystemId.createDCMotorSystem(
-            DCMotor.getCIM(1),TestSparkMaxConstants.MOI,
+           new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),TestSparkMaxConstants.MOI,
             TestSparkMaxConstants.GearRatio
             ),
-            DCMotor.getCIM(1)
+            new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
 
-        sparkSim = new SparkMaxSim(cim,DCMotor.getCIM(1)
+        sparkSim = new SparkMaxSim(cim,new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
     }
 

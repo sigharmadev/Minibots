@@ -62,7 +62,7 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
 
     @Override 
     public void updateInputs(TestSparkIOInputs inputs) {
-        inputs.motorRPM = RPM.of(cimEncoder.getVelocity());
+        inputs.motorRPM = cimEncoder.getVelocity();
         inputs.motorCurrent = Amps.of(cim.getOutputCurrent());
     }
 }
