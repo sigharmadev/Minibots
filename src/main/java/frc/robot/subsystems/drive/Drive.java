@@ -29,6 +29,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
@@ -57,10 +58,10 @@ public class Drive extends SubsystemBase{
     //this.gyro= gyro;
 
     if(Constants.getRobot()== RobotType.COMPETITION){
-      mecanum[0]= new Mecanum(new MecanumHardwareIO(1, false), "FrontLeft");
-      mecanum[1]= new Mecanum(new MecanumHardwareIO(2, true), "FrontRight");
-      mecanum[2]= new Mecanum(new MecanumHardwareIO(3, false), "BackLeft");
-      mecanum[3]= new Mecanum(new MecanumHardwareIO(4, true), "BackRight");
+      mecanum[0]= new Mecanum(new MecanumHardwareIO(1, false), "FrontRight");
+      mecanum[1]= new Mecanum(new MecanumHardwareIO(2, true), "FrontLeft");
+      mecanum[2]= new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
+      mecanum[3]= new Mecanum(new MecanumHardwareIO(4, false), "BackRight");
     } else if(Constants.getRobot()==RobotType.SIMBOT){
       mecanum[0]= new Mecanum(new MecanumSimIO(1, false), "FrontLeft");
       mecanum[1]= new Mecanum(new MecanumSimIO(2, true), "FrontRight");
@@ -160,7 +161,17 @@ public class Drive extends SubsystemBase{
   public double getMaxAngularSpeed(){
     return (MecanumConstants.maxLinearSpeedMetersPerSecond)/(BaseRadius);
   }
-  
+
+  public void bypassDuty(double dutycycle){
+    mecanum[0].bypass(dutycycle);
+    mecanum[1].bypass(dutycycle);
+    mecanum[2].bypass(dutycycle);
+    mecanum[3].bypass(dutycycle);
+  }
+
+  public Command bypass(double dutycycle){
+    return startEnd(() -> {bypassDuty(dutycycle);}, this::stop);
+  }
   public Translation2d[] getWheelLocations(){
     return new Translation2d[]{
       MecanumConstants.FrontLeft,

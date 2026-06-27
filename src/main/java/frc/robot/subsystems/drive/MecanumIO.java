@@ -18,11 +18,12 @@ public interface MecanumIO {
         public double driveRotsVelocity= 0.0;
         public double driveAngleRots= 0.0;
         public Current driveCurrent= Amps.of(0);
+        public Voltage appliedVoltage= Volts.of(0);
     }
 
     public default void updateInputs(MecanumIOInputs inputs) {}
 
     public default void runVelocity(AngularVelocity velocity) {}
 
-    public default void bypass(){}
+    public default void bypass(double dutycycle){}
 }

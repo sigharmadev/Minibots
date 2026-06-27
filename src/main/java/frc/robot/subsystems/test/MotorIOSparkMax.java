@@ -2,6 +2,7 @@ package frc.robot.subsystems.test;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -46,6 +47,8 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
         .maxAcceleration(TestSparkMaxConstants.acceleration)
         .allowedProfileError(TestSparkMaxConstants.allowedProfileError);
 
+        cimConfig.inverted(true);
+
         cimConfig.smartCurrentLimit(9);
          
         cim.configure(cimConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -64,5 +67,6 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
     public void updateInputs(TestSparkIOInputs inputs) {
         inputs.motorRPM = cimEncoder.getVelocity();
         inputs.motorCurrent = Amps.of(cim.getOutputCurrent());
+        inputs.voltageApplied= Volts.of((cim.getAppliedOutput())*(cim.getBusVoltage()));
     }
 }

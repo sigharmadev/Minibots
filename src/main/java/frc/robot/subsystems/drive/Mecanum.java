@@ -19,6 +19,8 @@ public class Mecanum extends SubsystemBase {
     public final MecanumIOInputsAutoLogged inputs= new MecanumIOInputsAutoLogged();
     private final String name;
 
+    private AngularVelocity velocitySetpoint;
+
     public Mecanum(MecanumIO io, String name) {
         this.io = io;
         this.name= name;
@@ -27,9 +29,11 @@ public class Mecanum extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Mecanum/" + name, inputs);
+        Logger.recordOutput("Velocity/Setpoint" + name, velocitySetpoint);
     }
 
     public void setVelocity(AngularVelocity velocity) {
+        velocitySetpoint= velocity;
         io.runVelocity(velocity);
     }
 
@@ -52,5 +56,9 @@ public class Mecanum extends SubsystemBase {
 
     public void stop(){
         setVelocity(RPM.of(0));
+    }
+
+    public void bypass(double dutycycle){
+        io.bypass(dutycycle);
     }
 }

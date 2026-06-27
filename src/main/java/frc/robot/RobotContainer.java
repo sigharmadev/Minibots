@@ -42,6 +42,7 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     private SparkMax testSparkMax;
     private Drive drive;
+    private SparkMax secondTestSparkMax;
     private CANBus roborioCANBus = new CANBus();
 
     public RobotContainer() {
@@ -64,13 +65,19 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-      gamepad_.povUp().whileTrue(testSparkMax.testCommand());
+      gamepad_.a().whileTrue(testSparkMax.testCommand());
+      gamepad_.b().whileTrue(secondTestSparkMax.testCommand());
     }
 
     private void configureDriveBindings(){
       gamepad_.povDown().whileTrue(drive.runLinearCmd(MetersPerSecond.of(0.4), MetersPerSecond.of(0),
         RadiansPerSecond.of(0)));
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
+
+      gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
+      RadiansPerSecond.of(0))); 
+
+      gamepad_.povLeft().whileTrue(drive.bypass(0.50));
     }
 
 
@@ -98,11 +105,13 @@ public class RobotContainer {
     private void buildSimBot() {
       testSparkMax = new SparkMax(new SparkMaxSimIO(5));
       drive= new Drive();
+      secondTestSparkMax= new SparkMax(new SparkMaxSimIO(6));
     }
 
     private void buildComp() {
       testSparkMax = new SparkMax(new MotorIOSparkMax(5));    
       drive= new Drive();
+      secondTestSparkMax= new SparkMax(new MotorIOSparkMax(6));
     }
 
     private void createDefaultSubsystems() {

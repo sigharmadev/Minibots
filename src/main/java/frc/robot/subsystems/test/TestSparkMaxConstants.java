@@ -8,14 +8,14 @@ public class TestSparkMaxConstants {
     public static final int ENCODER_COUNTS_PER_REVOLUTION = 2150;
     public static final boolean ENCODER_INVERTED = true;
 
-    public static final double kP= 0.001;
+    public static final double kP= 0.0025;
     public static final double kI= 0.0;
     public static final double kD= 0.0;
     public static final double kS= 0.01;
-    public static final double kV= 0.0035;
+    public static final double kV= 0.001;
     public static final double kA= 0.0;
 
-    public static final AngularVelocity velocitySetpoint= RPM.of(200.0); //RPM
+    public static final AngularVelocity velocitySetpoint= RPM.of(100.0); //RPM
 
     public static final double cruiseVelocity= 80;
     public static final double acceleration= 125; //RPM/s

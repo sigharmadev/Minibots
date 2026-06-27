@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -15,6 +16,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -33,25 +35,26 @@ public class MecanumHardwareIO implements MecanumIO {
 
         SparkMaxConfig motorConfig= new SparkMaxConfig();
 
-        motorConfig.encoder.countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION)
-        .inverted(MecanumConstants.ENCODER_INVERTED);
+        motorConfig.encoder
+            .countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION);
+            //.inverted(MecanumConstants.ENCODER_INVERTED);
 
-        motorConfig.closedLoop.
-        p(MecanumConstants.kP)
-        .i(MecanumConstants.kI)
-        .d(MecanumConstants.kD);
-
-        motorConfig.closedLoop.feedForward.
-        kS(MecanumConstants.kS)
-        .kV(MecanumConstants.kV)
-        .kA(MecanumConstants.kA);
+        motorConfig
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(9)
+            .closedLoop
+                .p(CanID == 2 ? MecanumConstants.kP : 0.0)
+                .i(MecanumConstants.kI)
+                .d(MecanumConstants.kD)
+                .feedForward
+                    .kS(MecanumConstants.kS)
+                    .kV(MecanumConstants.kV)
+                    .kA(MecanumConstants.kA);
 
         motorConfig.closedLoop.maxMotion.
         cruiseVelocity(MecanumConstants.cruiseVelocity)
-        .maxAcceleration(MecanumConstants.acceleration)
-        .allowedProfileError(MecanumConstants.allowedProfileError);
-
-        motorConfig.smartCurrentLimit(9);
+        .maxAcceleration(MecanumConstants.acceleration);
+        // .allowedProfileError(MecanumConstants.allowedProfileError);
 
         motorConfig.inverted(motorInverted);
         
@@ -61,12 +64,12 @@ public class MecanumHardwareIO implements MecanumIO {
     @Override
     public void runVelocity(AngularVelocity velocity){
         Logger.recordOutput("DebugDevVelocity", velocity);
-        motorController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
+        motorController.setSetpoint(velocity.in(RPM), ControlType.kVelocity);
     }
     
     @Override
-    public void bypass(){
-        motor.set(1.0);
+    public void bypass(double dutycycle){
+        motor.set(dutycycle);
     }
 
     @Override 
@@ -76,5 +79,6 @@ public class MecanumHardwareIO implements MecanumIO {
         inputs.driveAngleRots= 10.0;
         inputs.driveRotsVelocity= motorEncoder.getVelocity();
         inputs.driveCurrent= Amps.of(motor.getOutputCurrent());
+        inputs.appliedVoltage= Volts.of((motor.getAppliedOutput())*(motor.getBusVoltage()));
     }
 }

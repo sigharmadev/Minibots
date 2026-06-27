@@ -15,6 +15,7 @@ public interface TestSparkMaxIO {
     public static class TestSparkIOInputs{
         public Current motorCurrent = Amps.zero();
         public double motorRPM = 0.0;
+        public Voltage voltageApplied= Volts.of(0.0);
     }
 
     public default void updateInputs(TestSparkIOInputs inputs) {}
