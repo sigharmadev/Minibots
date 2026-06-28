@@ -161,12 +161,12 @@ public class DriveCommands {
               omega * drive.getMaxAngularSpeed());
           boolean isFlipped = DriverStation.getAlliance().isPresent()
               && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
+          
+          drive.bypassDuty(
             speeds
           );
         },
         drive::stop
     );
   }
-  
 }

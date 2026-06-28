@@ -43,7 +43,7 @@ public class MecanumHardwareIO implements MecanumIO {
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(9)
             .closedLoop
-                .p(CanID == 2 ? MecanumConstants.kP : 0.0)
+                .p(CanID == 2 ? MecanumConstants.kP : 0.0) //Moving specific motor to kP 
                 .i(MecanumConstants.kI)
                 .d(MecanumConstants.kD)
                 .feedForward
@@ -68,7 +68,7 @@ public class MecanumHardwareIO implements MecanumIO {
     }
     
     @Override
-    public void bypass(double dutycycle){
+    public void duty(double dutycycle){
         motor.set(dutycycle);
     }
 

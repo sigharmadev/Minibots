@@ -25,5 +25,5 @@ public interface MecanumIO {
 
     public default void runVelocity(AngularVelocity velocity) {}
 
-    public default void bypass(double dutycycle){}
+    public default void duty(double dutycycle){}
 }

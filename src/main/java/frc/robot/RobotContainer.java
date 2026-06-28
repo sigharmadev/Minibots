@@ -66,7 +66,6 @@ public class RobotContainer {
 
     private void configureBindings() {   
       gamepad_.a().whileTrue(testSparkMax.testCommand());
-      gamepad_.b().whileTrue(secondTestSparkMax.testCommand());
     }
 
     private void configureDriveBindings(){
@@ -76,8 +75,6 @@ public class RobotContainer {
 
       gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
       RadiansPerSecond.of(0))); 
-
-      gamepad_.povLeft().whileTrue(drive.bypass(0.50));
     }
 
 
@@ -105,13 +102,11 @@ public class RobotContainer {
     private void buildSimBot() {
       testSparkMax = new SparkMax(new SparkMaxSimIO(5));
       drive= new Drive();
-      secondTestSparkMax= new SparkMax(new SparkMaxSimIO(6));
     }
 
     private void buildComp() {
       testSparkMax = new SparkMax(new MotorIOSparkMax(5));    
       drive= new Drive();
-      secondTestSparkMax= new SparkMax(new MotorIOSparkMax(6));
     }
 
     private void createDefaultSubsystems() {

@@ -58,7 +58,7 @@ public class Mecanum extends SubsystemBase {
         setVelocity(RPM.of(0));
     }
 
-    public void bypass(double dutycycle){
-        io.bypass(dutycycle);
+    public void duty(double dutycycle){
+        io.duty(dutycycle);
     }
 }

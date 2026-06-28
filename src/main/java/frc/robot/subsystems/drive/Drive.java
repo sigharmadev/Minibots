@@ -133,8 +133,8 @@ public class Drive extends SubsystemBase{
 
     wheelSpeeds.desaturate(MecanumConstants.maxLinearSpeedMetersPerSecond);
     //debug=200;
-    mecanum[0].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
-    mecanum[1].setSetpoint(wheelSpeeds.frontRightMetersPerSecond);
+    mecanum[0].setSetpoint(wheelSpeeds.frontRightMetersPerSecond);
+    mecanum[1].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
     mecanum[2].setSetpoint(wheelSpeeds.rearLeftMetersPerSecond);
     mecanum[3].setSetpoint(wheelSpeeds.rearRightMetersPerSecond);
     
@@ -162,16 +162,22 @@ public class Drive extends SubsystemBase{
     return (MecanumConstants.maxLinearSpeedMetersPerSecond)/(BaseRadius);
   }
 
-  public void bypassDuty(double dutycycle){
-    mecanum[0].bypass(dutycycle);
-    mecanum[1].bypass(dutycycle);
-    mecanum[2].bypass(dutycycle);
-    mecanum[3].bypass(dutycycle);
+  public void bypassDuty(ChassisSpeeds speeds){
+    ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
+    MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
+
+    double frontRightAngular= wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius);
+    double frontLeftAngular= wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius);
+    double backLeftAngular= wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius);
+    double backRightAngular= wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius);
+
+    mecanum[0].duty((frontRightAngular/312)*1.0);
+    mecanum[1].duty((frontLeftAngular/312)*1.0);
+    mecanum[2].duty((backLeftAngular/312)*1.0);
+    mecanum[3].duty((backRightAngular/312)*1.0);
+
   }
 
-  public Command bypass(double dutycycle){
-    return startEnd(() -> {bypassDuty(dutycycle);}, this::stop);
-  }
   public Translation2d[] getWheelLocations(){
     return new Translation2d[]{
       MecanumConstants.FrontLeft,
