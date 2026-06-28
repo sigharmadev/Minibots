@@ -10,7 +10,7 @@ public class MecanumConstants {
     public static final boolean ENCODER_INVERTED = false;
 
     //Change these for later when tuning
-    public static final double kP= 0.006; 
+    public static final double kP= 0.0055; 
     public static final double kI= 0.0;
     public static final double kD= 0.0;
     public static final double kS= 0.0;
@@ -31,5 +31,7 @@ public class MecanumConstants {
     public static final Translation2d BackLeft= new Translation2d(-0.21, -0.17);
     public static final Translation2d BackRight= new Translation2d(0.21, -0.17);  
 
-    public static final double maxLinearSpeedMetersPerSecond= 1.0;
+    public static final double maxLinearSpeedMetersPerSecond= 1.4;
+    public static final double maxRPM= 312.0;
+    public static final double maxWheelSpeedMetersPerSecond= (maxRPM/60.0)*2.0*Math.PI*wheelRadius;
 }

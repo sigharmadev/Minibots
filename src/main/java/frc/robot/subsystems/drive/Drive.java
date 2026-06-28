@@ -131,7 +131,7 @@ public class Drive extends SubsystemBase{
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
     MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
 
-    wheelSpeeds.desaturate(MecanumConstants.maxLinearSpeedMetersPerSecond);
+    wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
     //debug=200;
     mecanum[0].setSetpoint(wheelSpeeds.frontRightMetersPerSecond);
     mecanum[1].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
@@ -166,15 +166,29 @@ public class Drive extends SubsystemBase{
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
     MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
 
-    double frontRightAngular= wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius);
-    double frontLeftAngular= wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius);
-    double backLeftAngular= wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius);
-    double backRightAngular= wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius);
+    wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
 
-    mecanum[0].duty((frontRightAngular/312)*1.0);
-    mecanum[1].duty((frontLeftAngular/312)*1.0);
-    mecanum[2].duty((backLeftAngular/312)*1.0);
-    mecanum[3].duty((backRightAngular/312)*1.0);
+    Logger.recordOutput("WheelSpeeds/FrontRight", wheelSpeeds.frontRightMetersPerSecond);
+    Logger.recordOutput("WheelSpeeds/FrontLeft", wheelSpeeds.frontLeftMetersPerSecond);
+    Logger.recordOutput("WheelSpeeds/BackLeft", wheelSpeeds.rearLeftMetersPerSecond);
+    Logger.recordOutput("WheelSpeeds/BackRight", wheelSpeeds.rearRightMetersPerSecond);
+    Logger.recordOutput("WheelSpeeds/MaxWheelMetersPerSecond", MecanumConstants.maxWheelSpeedMetersPerSecond);
+
+    double frontRightAngular= 60.0*(wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double frontLeftAngular= 60.0*(wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double backLeftAngular= 60.0*(wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double backRightAngular= 60.0*(wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+
+    Logger.recordOutput("WheelSpeeds/FrontRightAngular", frontRightAngular);
+    Logger.recordOutput("WheelSpeeds/FrontLeftAngular", frontLeftAngular);
+    Logger.recordOutput("WheelSpeeds/BackRightAngular", backRightAngular);
+    Logger.recordOutput("WheelSpeeds/BackLeftAngular", backLeftAngular);
+
+
+    mecanum[0].duty((frontRightAngular/312)*0.1);
+    mecanum[1].duty((frontLeftAngular/312)*0.1);
+    mecanum[2].duty((backLeftAngular/312)*0.1);
+    mecanum[3].duty((backRightAngular/312)*0.1);
 
   }
 

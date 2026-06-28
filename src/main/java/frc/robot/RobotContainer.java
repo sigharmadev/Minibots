@@ -56,8 +56,8 @@ public class RobotContainer {
         DriveCommands.configure(
             drive,
             () -> -gamepad_.getLeftY(),
-            () -> -gamepad_.getLeftX(),
-            () -> -gamepad_.getRightX()
+            () -> -gamepad_.getRightX(),
+            () -> -gamepad_.getLeftX()
         );
         configureBindings();   
         configureDriveBindings(); 
@@ -65,16 +65,16 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-      gamepad_.a().whileTrue(testSparkMax.testCommand());
+      //gamepad_.a().whileTrue(testSparkMax.testCommand());
     }
 
     private void configureDriveBindings(){
-      gamepad_.povDown().whileTrue(drive.runLinearCmd(MetersPerSecond.of(0.4), MetersPerSecond.of(0),
-        RadiansPerSecond.of(0)));
+      /*gamepad_.povDown().whileTrue(drive.runLinearCmd(MetersPerSecond.of(0.4), MetersPerSecond.of(0),
+        RadiansPerSecond.of(0)));*/
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
 
-      gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
-      RadiansPerSecond.of(0))); 
+      /*gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
+      RadiansPerSecond.of(0))); */
     }
 
 
