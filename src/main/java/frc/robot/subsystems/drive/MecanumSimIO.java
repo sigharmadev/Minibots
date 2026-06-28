@@ -13,7 +13,7 @@ public class MecanumSimIO extends MecanumHardwareIO {
     private final DCMotorSim motorSim;
     private final SparkMaxSim sparkSim;
 
-    // Use a 540/775-sized brushed motor profile to match the goBILDA core physics
+    //Create new dc motor object based on specifications of exact motor 
     private static final DCMotor goBildaCore = new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1);
 
     public MecanumSimIO(int canID, boolean motorInverted) {
