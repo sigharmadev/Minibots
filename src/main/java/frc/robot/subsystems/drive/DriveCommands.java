@@ -115,17 +115,8 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  public static Pose2d rotateIfRed(Pose2d pose) {
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-      Translation2d center = new Translation2d(FieldConstants.layout.getFieldLength() / 2.0, FieldConstants.layout.getFieldWidth() / 2.0);
-      pose = pose.rotateAround(center, Rotation2d.fromDegrees(180.0)) ;
-    }
-
-    return pose ;
-  }
-
   /**
-   * Field relative drive command using two joysticks (controlling linear and
+   * Robot relative drive command using two joysticks (controlling linear and
    * angular velocities). This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
    */
   public static Command joystickDrive() {
@@ -135,7 +126,7 @@ public class DriveCommands {
   }
 
   /**
-   * Field relative drive command using two joysticks (controlling linear and
+   * Robot relative drive command using two joysticks (controlling linear and
    * angular velocities).
    */
   public static Command joystickDrive(

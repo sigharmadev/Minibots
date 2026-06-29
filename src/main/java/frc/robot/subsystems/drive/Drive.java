@@ -1,6 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+
 
 package frc.robot.subsystems.drive;
 
@@ -98,16 +96,6 @@ public class Drive extends SubsystemBase{
 
     Logger.recordOutput("Wheel/Setpoint", RPM.of(500));
 
-    /*for(var i=0; i<4; i++){
-      mecanum[i].periodic();
-    }*/
-
-    /*  if(DriverStation.isDisabled()){
-      for(var i=0; i<4; i++){
-        mecanum[i].stop();
-      }
-    }
-    */
     Logger.recordOutput("DebugDev", debug);
 
     //Getting new wheel positions
