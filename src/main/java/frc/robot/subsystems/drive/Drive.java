@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -48,6 +49,10 @@ public class Drive extends SubsystemBase{
   private Rotation2d gyroRotation= Rotation2d.kZero;
   static final Lock odometryLock = new ReentrantLock();
   public static int debug=1;
+  public static DoubleSupplier omegaSupplier_;
+
+  public static int turn=1;
+
 
   private final Mecanum mecanum[] = new Mecanum[4];
 
@@ -61,10 +66,10 @@ public class Drive extends SubsystemBase{
       mecanum[2]= new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
       mecanum[3]= new Mecanum(new MecanumHardwareIO(4, false), "BackRight");
     } else if(Constants.getRobot()==RobotType.SIMBOT){
-      mecanum[0]= new Mecanum(new MecanumSimIO(1, false), "FrontLeft");
-      mecanum[1]= new Mecanum(new MecanumSimIO(2, true), "FrontRight");
-      mecanum[2]= new Mecanum(new MecanumSimIO(3, false), "BackLeft");
-      mecanum[3]= new Mecanum(new MecanumSimIO(4, true), "BackRight");
+      mecanum[0]= new Mecanum(new MecanumSimIO(1, false), "FrontRight");
+      mecanum[1]= new Mecanum(new MecanumSimIO(2, true), "FrontLeft");
+      mecanum[2]= new Mecanum(new MecanumSimIO(3, true), "BackLeft");
+      mecanum[3]= new Mecanum(new MecanumSimIO(4, false), "BackRight");
     }
 
     Translation2d[] wheelLocations= getWheelLocations();
@@ -115,6 +120,10 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("DebugDev", debug);
   }
 
+  public void configure(DoubleSupplier omegaSupplier){
+    omegaSupplier_= omegaSupplier;
+  }
+
   public void runVelocity(ChassisSpeeds speeds){
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
     MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
@@ -154,6 +163,8 @@ public class Drive extends SubsystemBase{
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
     MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
 
+    Logger.recordOutput("Omega/Discrete", discreteSpeeds.omegaRadiansPerSecond);
+
     wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
 
     Logger.recordOutput("WheelSpeeds/FrontRight", wheelSpeeds.frontRightMetersPerSecond);
@@ -172,11 +183,37 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("WheelSpeeds/BackRightAngular", backRightAngular);
     Logger.recordOutput("WheelSpeeds/BackLeftAngular", backLeftAngular);
 
+    if(omegaSupplier_.getAsDouble()<0.001 && omegaSupplier_.getAsDouble()>-0.001){
+      turn=1;
+    } else {
+      turn=-1;
+    }
 
-    mecanum[0].duty((frontRightAngular/312)*0.1);
-    mecanum[1].duty((frontLeftAngular/312)*0.1);
-    mecanum[2].duty((backLeftAngular/312)*0.1);
-    mecanum[3].duty((backRightAngular/312)*0.1);
+    Logger.recordOutput("Omega/SupplierDouble", omegaSupplier_.getAsDouble());
+    Logger.recordOutput("Omega/Turn", turn);
+    mecanum[0].duty((frontRightAngular/312)*1.0*turn);
+    mecanum[1].duty((frontLeftAngular/312)*1.0);
+    mecanum[2].duty((backLeftAngular/312)*1.0*turn);
+    mecanum[3].duty((backRightAngular/312)*1.0);
+
+  }
+
+  public void dutyTurn(ChassisSpeeds speeds){
+    ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
+    MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
+
+    wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
+
+    double frontRightAngular= 60.0*(wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double frontLeftAngular= 60.0*(wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double backLeftAngular= 60.0*(wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+    double backRightAngular= 60.0*(wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
+
+
+    mecanum[0].duty((frontRightAngular/312)*1.0);
+    mecanum[1].duty((frontLeftAngular/312)*-1.0);
+    mecanum[2].duty((backLeftAngular/312)*-1.0);
+    mecanum[3].duty((backRightAngular/312)*1.0);
 
   }
 

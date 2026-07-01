@@ -30,8 +30,8 @@ public class SparkMax extends SubsystemBase {
         io.test(velocity);
     }
 
-    public Command bypass(){
-        return Commands.run(() -> io.bypass(), this);
+    public Command bypass(double dutycycle){
+        return Commands.startEnd(() -> io.bypass(dutycycle), this::stop);
     }
 
     public void runVelocitySetpoint() {

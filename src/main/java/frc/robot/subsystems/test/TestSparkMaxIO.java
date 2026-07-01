@@ -22,5 +22,5 @@ public interface TestSparkMaxIO {
 
     public default void test(AngularVelocity velocity) {}
 
-    public default void bypass(){}
+    public default void bypass(double dutycycle){}
 }

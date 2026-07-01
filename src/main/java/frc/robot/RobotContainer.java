@@ -56,8 +56,12 @@ public class RobotContainer {
         DriveCommands.configure(
             drive,
             () -> -gamepad_.getLeftY(),
-            () -> -gamepad_.getRightX(),
-            () -> -gamepad_.getLeftX()
+            () -> -gamepad_.getLeftX(),
+            () -> -gamepad_.getRightX()
+        );
+
+        drive.configure(
+          () -> -gamepad_.getRightX()
         );
         configureBindings();   
         configureDriveBindings(); 
@@ -65,14 +69,15 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-      //gamepad_.a().whileTrue(testSparkMax.testCommand());
+      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.5));
+      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.5));
     }
 
     private void configureDriveBindings(){
       /*gamepad_.povDown().whileTrue(drive.runLinearCmd(MetersPerSecond.of(0.4), MetersPerSecond.of(0),
         RadiansPerSecond.of(0)));*/
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
-
+      //drive.setDefaultCommand(DriveCommands.turn());
       /*gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
       RadiansPerSecond.of(0))); */
     }
@@ -100,18 +105,18 @@ public class RobotContainer {
     }
 
     private void buildSimBot() {
-      testSparkMax = new SparkMax(new SparkMaxSimIO(5));
+      testSparkMax = new SparkMax(new SparkMaxSimIO( 6));
       drive= new Drive();
     }
 
     private void buildComp() {
-      testSparkMax = new SparkMax(new MotorIOSparkMax(5));    
+      testSparkMax = new SparkMax(new MotorIOSparkMax(6));    
       drive= new Drive();
     }
 
     private void createDefaultSubsystems() {
       if(testSparkMax == null) {
-        testSparkMax= new SparkMax(new MotorIOSparkMax(5));
+        testSparkMax= new SparkMax(new MotorIOSparkMax(6));
       }
     }
 }

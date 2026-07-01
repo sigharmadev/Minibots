@@ -59,8 +59,8 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
         cimController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
     }
     @Override
-    public void bypass(){
-        cim.set(0.2);
+    public void bypass(double dutycycle){
+        cim.set(dutycycle);
     }
 
     @Override 

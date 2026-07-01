@@ -34,4 +34,6 @@ public class MecanumConstants {
     public static final double maxLinearSpeedMetersPerSecond= 1.4;
     public static final double maxRPM= 312.0;
     public static final double maxWheelSpeedMetersPerSecond= (maxRPM/60.0)*2.0*Math.PI*wheelRadius;
+
+    public static boolean turn= false;
 }
