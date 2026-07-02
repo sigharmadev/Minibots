@@ -183,11 +183,6 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("WheelSpeeds/BackRightAngular", backRightAngular);
     Logger.recordOutput("WheelSpeeds/BackLeftAngular", backLeftAngular);
 
-    if(omegaSupplier_.getAsDouble()<0.001 && omegaSupplier_.getAsDouble()>-0.001){
-      turn=1;
-    } else {
-      turn=-1;
-    }
 
     Logger.recordOutput("Omega/SupplierDouble", omegaSupplier_.getAsDouble());
     Logger.recordOutput("Omega/Turn", turn);

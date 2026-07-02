@@ -26,10 +26,10 @@ public class MecanumConstants {
     public static final double wheelRadius=0.048; //definitely need to change
 
     //Change these later
-    public static final Translation2d FrontLeft= new Translation2d(-0.21, 0.17);
-    public static final Translation2d FrontRight= new Translation2d(0.21, 0.17);
-    public static final Translation2d BackLeft= new Translation2d(-0.21, -0.17);
-    public static final Translation2d BackRight= new Translation2d(0.21, -0.17);  
+    public static final Translation2d FrontLeft= new Translation2d(0.21, 0.17);
+    public static final Translation2d FrontRight= new Translation2d(0.21, -0.17);
+    public static final Translation2d BackLeft= new Translation2d(-0.21, 0.17);
+    public static final Translation2d BackRight= new Translation2d(-0.21, -0.17);  
 
     public static final double maxLinearSpeedMetersPerSecond= 1.4;
     public static final double maxRPM= 312.0;
