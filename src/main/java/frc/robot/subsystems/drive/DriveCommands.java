@@ -125,11 +125,6 @@ public class DriveCommands {
     return joystickDrive(drive_, xSupplier_, ySupplier_, omegaSupplier_);
   }
 
-  public static Command turn(){
-    if (!configured) throw new IllegalStateException("DriveCommands joystickDrive called without first configuring!");
-    return turnCommand(drive_, xSupplier_, ySupplier_, omegaSupplier_);
-  }
-
   /**
    * Robot relative drive command using two joysticks (controlling linear and
    * angular velocities).
@@ -166,23 +161,5 @@ public class DriveCommands {
         drive::stop
     );
   }
-
-  public static Command turnCommand(
-    Drive drive, 
-    DoubleSupplier xSupplier, 
-    DoubleSupplier ySupplier, 
-    DoubleSupplier omegaSupplier){
-    return drive.runEnd(()->{
-      Translation2d linearVelocity = getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-      double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
-      ChassisSpeeds speeds = new ChassisSpeeds(
-              linearVelocity.getX() * drive.getMaxLinearSpeed(),
-              linearVelocity.getY() * drive.getMaxLinearSpeed(),
-              omega * drive.getMaxAngularSpeed()*-1.0);
-      drive.dutyTurn(
-        speeds
-      );
-    },
-    drive::stop);
-  }
+ 
 }

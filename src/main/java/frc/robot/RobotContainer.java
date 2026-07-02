@@ -28,9 +28,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOMaple;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.MecanumSimIO;
+import frc.robot.subsystems.drive.NavXIO;
 import frc.robot.subsystems.test.MotorIOSparkMax;
 import frc.robot.subsystems.test.SparkMax;
 import frc.robot.subsystems.test.SparkMaxSimIO;
@@ -59,27 +58,18 @@ public class RobotContainer {
             () -> -gamepad_.getLeftX(),
             () -> -gamepad_.getRightX()
         );
-
-        drive.configure(
-          () -> -gamepad_.getRightX()
-        );
         configureBindings();   
         configureDriveBindings(); 
 
     }
 
     private void configureBindings() {   
-      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.5));
-      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.5));
+      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.7));
+      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.7));
     }
 
     private void configureDriveBindings(){
-      /*gamepad_.povDown().whileTrue(drive.runLinearCmd(MetersPerSecond.of(0.4), MetersPerSecond.of(0),
-        RadiansPerSecond.of(0)));*/
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
-      //drive.setDefaultCommand(DriveCommands.turn());
-      /*gamepad_.povUp().whileTrue(drive.runLinearCmd(MetersPerSecond.of(-0.4), MetersPerSecond.of(0), 
-      RadiansPerSecond.of(0))); */
     }
 
 
@@ -106,12 +96,12 @@ public class RobotContainer {
 
     private void buildSimBot() {
       testSparkMax = new SparkMax(new SparkMaxSimIO( 6));
-      drive= new Drive();
+      drive= new Drive(null);
     }
 
     private void buildComp() {
       testSparkMax = new SparkMax(new MotorIOSparkMax(6));    
-      drive= new Drive();
+      drive= new Drive(new NavXIO());
     }
 
     private void createDefaultSubsystems() {

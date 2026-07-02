@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
 import frc.robot.generated.CompTunerConstants;
+import frc.robot.subsystems.drive.GyroIO.GyroIOInputs;
 import frc.robot.util.LoggedTracer;
 
 
@@ -42,45 +43,41 @@ public class Drive extends SubsystemBase{
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
   public final double BaseRadius;
 
-  //private final GyroIO gyro;
-  private final GyroIOInputsAutoLogged gyroInputs= new GyroIOInputsAutoLogged();
+  private final GyroIO gyro;
   private final MecanumDriveKinematics kinematics;
-    private MecanumDriveOdometry odometry;
-  private Rotation2d gyroRotation= Rotation2d.kZero;
-  static final Lock odometryLock = new ReentrantLock();
+  private MecanumDriveOdometry odometry;
   public static int debug=1;
-  public static DoubleSupplier omegaSupplier_;
-
-  public static int turn=1;
-
-
   private final Mecanum mecanum[] = new Mecanum[4];
+  private final GyroIOInputsAutoLogged gyroInputs= new GyroIOInputsAutoLogged();
+  private Rotation2d gyroRotation= Rotation2d.kZero;
 
-  /** Constructs a MecanumDrive and resets the gyro. */
-  public Drive(/*GyroIO gyro*/ ) {
-    //this.gyro= gyro;
-
-    if(Constants.getRobot()== RobotType.COMPETITION){
-      mecanum[0]= new Mecanum(new MecanumHardwareIO(1, false), "FrontRight");
-      mecanum[1]= new Mecanum(new MecanumHardwareIO(2, true), "FrontLeft");
-      mecanum[2]= new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
-      mecanum[3]= new Mecanum(new MecanumHardwareIO(4, false), "BackRight");
-    } else if(Constants.getRobot()==RobotType.SIMBOT){
-      mecanum[0]= new Mecanum(new MecanumSimIO(1, false), "FrontRight");
-      mecanum[1]= new Mecanum(new MecanumSimIO(2, true), "FrontLeft");
-      mecanum[2]= new Mecanum(new MecanumSimIO(3, true), "BackLeft");
-      mecanum[3]= new Mecanum(new MecanumSimIO(4, false), "BackRight");
-    }
-
+  public Drive(GyroIO gyro) {
     Translation2d[] wheelLocations= getWheelLocations();
-    kinematics= new MecanumDriveKinematics(wheelLocations[0], wheelLocations[1],
+    this.kinematics= new MecanumDriveKinematics(wheelLocations[0], wheelLocations[1],
     wheelLocations[2], wheelLocations[3]);
 
+    if (Constants.getRobot() == RobotType.COMPETITION) {
+      this.gyro = gyro; 
+
+      mecanum[0] = new Mecanum(new MecanumHardwareIO(1, false), "FrontRight");
+      mecanum[1] = new Mecanum(new MecanumHardwareIO(2, true), "FrontLeft");
+      mecanum[2] = new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
+      mecanum[3] = new Mecanum(new MecanumHardwareIO(4, false), "BackRight");
+  
+    } else {
+      mecanum[0] = new Mecanum(new MecanumSimIO(1, false), "FrontRight");
+      mecanum[1] = new Mecanum(new MecanumSimIO(2, true), "FrontLeft");
+      mecanum[2] = new Mecanum(new MecanumSimIO(3, true), "BackLeft");
+      mecanum[3] = new Mecanum(new MecanumSimIO(4, false), "BackRight");
+
+      // First and only assignment for simulation
+      this.gyro = new GyroIOSim(kinematics, mecanum); 
+    }
+    
     odometry= new MecanumDriveOdometry(kinematics, gyroRotation, 
-    new MecanumDriveWheelPositions(mecanum[0].getWheelPositions(), mecanum[1].getWheelPositions(),
+    new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
     mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions()), 
     Pose2d.kZero);
-    debug=1;
 
     BaseRadius= 
       Math.max(
@@ -96,20 +93,20 @@ public class Drive extends SubsystemBase{
   @Override
   public void periodic(){
     LoggedTracer.reset();
-    //gyro.updateInputs(gyroInputs);
-    Logger.processInputs("Gyro", gyroInputs);
+    gyro.updateInputs(gyroInputs);
+    Logger.processInputs("Gyro",gyroInputs);
 
-    Logger.recordOutput("Wheel/Setpoint", RPM.of(500));
-
-    Logger.recordOutput("DebugDev", debug);
 
     //Getting new wheel positions
-    var lastWheels= new MecanumDriveWheelPositions(mecanum[0].getWheelPositions(), mecanum[1].getWheelPositions(),
+    var lastWheels= new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
     mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions());
     //Getting new gyro rotation
     gyroRotation= gyroInputs.yawPosition;
     //Updating robot pose
     var robotPose= odometry.update(gyroRotation, lastWheels);
+    Logger.recordOutput("RobotPose/X", robotPose.getX());
+    Logger.recordOutput("RobotPose/Y", robotPose.getY());
+    Logger.recordOutput("RobotPose/Rotation", robotPose.getRotation().getRadians());
   }
 
   public void stop(){
@@ -120,9 +117,7 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("DebugDev", debug);
   }
 
-  public void configure(DoubleSupplier omegaSupplier){
-    omegaSupplier_= omegaSupplier;
-  }
+
 
   public void runVelocity(ChassisSpeeds speeds){
     ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
@@ -138,9 +133,6 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("DebugDev", debug);
   }
 
-  /*public void runVelocity(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
-    runVelocity(new ChassisSpeeds(x, y, omega));
-  }*/
 
   public Command runVelocityCmd(ChassisSpeeds speeds){
     return startEnd(()-> {runVelocity(speeds);}, this::stop);
@@ -184,30 +176,9 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("WheelSpeeds/BackLeftAngular", backLeftAngular);
 
 
-    Logger.recordOutput("Omega/SupplierDouble", omegaSupplier_.getAsDouble());
-    Logger.recordOutput("Omega/Turn", turn);
-    mecanum[0].duty((frontRightAngular/312)*1.0*turn);
-    mecanum[1].duty((frontLeftAngular/312)*1.0);
-    mecanum[2].duty((backLeftAngular/312)*1.0*turn);
-    mecanum[3].duty((backRightAngular/312)*1.0);
-
-  }
-
-  public void dutyTurn(ChassisSpeeds speeds){
-    ChassisSpeeds discreteSpeeds= ChassisSpeeds.discretize(speeds, 0.02);
-    MecanumDriveWheelSpeeds wheelSpeeds= kinematics.toWheelSpeeds(discreteSpeeds);
-
-    wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
-
-    double frontRightAngular= 60.0*(wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
-    double frontLeftAngular= 60.0*(wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
-    double backLeftAngular= 60.0*(wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
-    double backRightAngular= 60.0*(wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
-
-
     mecanum[0].duty((frontRightAngular/312)*1.0);
-    mecanum[1].duty((frontLeftAngular/312)*-1.0);
-    mecanum[2].duty((backLeftAngular/312)*-1.0);
+    mecanum[1].duty((frontLeftAngular/312)*1.0);
+    mecanum[2].duty((backLeftAngular/312)*1.0);
     mecanum[3].duty((backRightAngular/312)*1.0);
 
   }

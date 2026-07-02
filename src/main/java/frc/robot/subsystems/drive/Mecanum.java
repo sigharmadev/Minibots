@@ -61,4 +61,9 @@ public class Mecanum extends SubsystemBase {
     public void duty(double dutycycle){
         io.duty(dutycycle);
     }
+
+    public double getWheelVelocity(){
+        double velocityMetersPerSecond= (inputs.driveRotsVelocity/60)*2*Math.PI*MecanumConstants.wheelRadius;
+        return velocityMetersPerSecond;
+    }
 }
