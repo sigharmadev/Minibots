@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.NavXIO;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -26,6 +28,7 @@ public class Robot extends LoggedRobot {
   private final RobotContainer m_robotContainer;
 
   public Robot() {
+    
     // Record metadata
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -103,7 +106,8 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void autonomousExit() {}

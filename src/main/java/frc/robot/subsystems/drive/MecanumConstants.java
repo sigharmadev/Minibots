@@ -21,7 +21,6 @@ public class MecanumConstants {
     public static final double acceleration= 100; //RPM/s
     public static final double allowedProfileError= 5.0; //RPM
 
-    public static final double MOI= 0.01;
     public static final double DriveGearRatio= 1.0; //might need to change
     public static final double wheelRadius=0.048; //definitely need to change
 
@@ -31,9 +30,10 @@ public class MecanumConstants {
     public static final Translation2d BackLeft= new Translation2d(-0.21, 0.17);
     public static final Translation2d BackRight= new Translation2d(-0.21, -0.17);  
 
-    public static final double maxLinearSpeedMetersPerSecond= 1.4;
     public static final double maxRPM= 312.0;
     public static final double maxWheelSpeedMetersPerSecond= (maxRPM/60.0)*2.0*Math.PI*wheelRadius;
+    public static final double maxLinearSpeedMetersPerSecond= maxWheelSpeedMetersPerSecond;
+
 
     public static boolean turn= false;
 }

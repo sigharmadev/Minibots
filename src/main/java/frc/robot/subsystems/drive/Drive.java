@@ -11,7 +11,11 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -24,9 +28,11 @@ import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -50,15 +56,20 @@ public class Drive extends SubsystemBase{
   private final Mecanum mecanum[] = new Mecanum[4];
   private final GyroIOInputsAutoLogged gyroInputs= new GyroIOInputsAutoLogged();
   private Rotation2d gyroRotation= Rotation2d.kZero;
+  private MecanumDrivePoseEstimator poseEstimator;
+  private Rotation2d gyroOffset = Rotation2d.kZero;
+  private RobotConfig config;
+  private MecanumDriveWheelPositions lastWheels= new MecanumDriveWheelPositions(
+    0,0,0,0
+  );
+
 
   public Drive(GyroIO gyro) {
     Translation2d[] wheelLocations= getWheelLocations();
     this.kinematics= new MecanumDriveKinematics(wheelLocations[0], wheelLocations[1],
     wheelLocations[2], wheelLocations[3]);
-
+    this.gyro = gyro; 
     if (Constants.getRobot() == RobotType.COMPETITION) {
-      this.gyro = gyro; 
-
       mecanum[0] = new Mecanum(new MecanumHardwareIO(1, false), "FrontRight");
       mecanum[1] = new Mecanum(new MecanumHardwareIO(2, true), "FrontLeft");
       mecanum[2] = new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
@@ -69,15 +80,24 @@ public class Drive extends SubsystemBase{
       mecanum[1] = new Mecanum(new MecanumSimIO(2, true), "FrontLeft");
       mecanum[2] = new Mecanum(new MecanumSimIO(3, true), "BackLeft");
       mecanum[3] = new Mecanum(new MecanumSimIO(4, false), "BackRight");
-
-      // First and only assignment for simulation
-      this.gyro = new GyroIOSim(kinematics, mecanum); 
     }
     
-    odometry= new MecanumDriveOdometry(kinematics, gyroRotation, 
-    new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
-    mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions()), 
-    Pose2d.kZero);
+    poseEstimator= new MecanumDrivePoseEstimator(kinematics, gyroRotation, 
+      lastWheels,
+      Pose2d.kZero);
+
+    config= new RobotConfig(
+      Config.MASS_KG_ROBOT,
+      Config.MOI_ROBOT,
+      new ModuleConfig(
+        MecanumConstants.wheelRadius, 
+        MecanumConstants.maxLinearSpeedMetersPerSecond,
+        1.0,
+        new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),
+        9.2, 
+        1),
+      getWheelLocations()
+    );
 
     BaseRadius= 
       Math.max(
@@ -88,6 +108,30 @@ public class Drive extends SubsystemBase{
             Math.hypot(MecanumConstants.BackLeft.getX(), MecanumConstants.BackLeft.getY()),
             Math.hypot(MecanumConstants.BackRight.getX(), MecanumConstants.BackRight.getY())));
 
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards)-> bypassDuty(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+
   }
   
   @Override
@@ -95,18 +139,13 @@ public class Drive extends SubsystemBase{
     LoggedTracer.reset();
     gyro.updateInputs(gyroInputs);
     Logger.processInputs("Gyro",gyroInputs);
-
-
     //Getting new wheel positions
-    var lastWheels= new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
+    lastWheels= new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
     mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions());
     //Getting new gyro rotation
     gyroRotation= gyroInputs.yawPosition;
     //Updating robot pose
-    var robotPose= odometry.update(gyroRotation, lastWheels);
-    Logger.recordOutput("RobotPose/X", robotPose.getX());
-    Logger.recordOutput("RobotPose/Y", robotPose.getY());
-    Logger.recordOutput("RobotPose/Rotation", robotPose.getRotation().getRadians());
+    poseEstimator.update(gyroRotation, lastWheels);
   }
 
   public void stop(){
@@ -181,6 +220,34 @@ public class Drive extends SubsystemBase{
     mecanum[2].duty((backLeftAngular/312)*1.0);
     mecanum[3].duty((backRightAngular/312)*1.0);
 
+  }
+
+  public Rotation2d getRotation() {
+    // Subtract the offset so that whatever position the robot was in 
+    // when you pressed reset becomes the new "0"
+    return gyroInputs.yawPosition.minus(gyroOffset);
+  }
+
+  public Command zeroGyro() {
+    // Store the current raw position as our new zero-point
+    return Commands.runOnce(()->this.gyroOffset = gyroInputs.yawPosition);
+  }
+
+  public Pose2d getPose(){
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public void resetPose(Pose2d pose){
+    poseEstimator.resetPosition(getRotation(), lastWheels, pose);
+  }
+
+  public ChassisSpeeds getChassisSpeeds(){
+    return kinematics.toChassisSpeeds(new MecanumDriveWheelSpeeds(
+      mecanum[1].getWheelVelocity(),
+      mecanum[0].getWheelVelocity(),
+      mecanum[2].getWheelVelocity(),
+      mecanum[3].getWheelVelocity()
+    ));
   }
 
   public Translation2d[] getWheelLocations(){

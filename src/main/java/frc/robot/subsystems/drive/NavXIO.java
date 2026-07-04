@@ -5,7 +5,6 @@ import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class NavXIO implements GyroIO {
-  // 2. CHANGE THIS: The 2026 constructor requires the new NavXComType enum
   private final AHRS navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
   public NavXIO() {
@@ -13,13 +12,13 @@ public class NavXIO implements GyroIO {
   }
 
   public Rotation2d getYawRotation() {
-    // This part stays exactly the same!
-    return Rotation2d.fromDegrees(-navX.getYaw());
+    return Rotation2d.fromDegrees(navX.getYaw());
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.yawPosition = getYawRotation();
-    inputs.yawVelocityRadPerSec = Math.toRadians(-navX.getRate());
+    inputs.yawVelocityRadPerSec = Math.toRadians(navX.getRate());
+    inputs.connected= navX.isConnected();
   }
 }

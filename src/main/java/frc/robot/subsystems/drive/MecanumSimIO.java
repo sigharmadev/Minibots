@@ -22,7 +22,7 @@ public class MecanumSimIO extends MecanumHardwareIO {
 
         motorSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
-                goBildaCore, MecanumConstants.MOI,
+                goBildaCore, Config.MOI_ROBOT,
                 MecanumConstants.DriveGearRatio
             ),
             goBildaCore

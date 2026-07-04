@@ -149,13 +149,15 @@ public class DriveCommands {
           ChassisSpeeds speeds = new ChassisSpeeds(
               linearVelocity.getX() * drive.getMaxLinearSpeed(),
               linearVelocity.getY() * drive.getMaxLinearSpeed(),
-              omega * drive.getMaxAngularSpeed()*-1.0);
+              omega * drive.getMaxAngularSpeed());
               Logger.recordOutput("Omega/Supplier", omega);
           boolean isFlipped = DriverStation.getAlliance().isPresent()
               && DriverStation.getAlliance().get() == Alliance.Red;
 
           drive.bypassDuty(
-            speeds
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+              speeds, drive.getRotation()
+              )
           );
         },
         drive::stop

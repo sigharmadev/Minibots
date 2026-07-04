@@ -76,7 +76,7 @@ public class MecanumHardwareIO implements MecanumIO {
     public void updateInputs(MecanumIOInputs inputs) {
         inputsDebug= 50;
         Logger.recordOutput("InputsDevDebug", inputsDebug);
-        inputs.driveAngleRots= 10.0;
+        inputs.driveAngleRots= motorEncoder.getPosition();
         inputs.driveRotsVelocity= motorEncoder.getVelocity();
         inputs.driveCurrent= Amps.of(motor.getOutputCurrent());
         inputs.appliedVoltage= Volts.of((motor.getAppliedOutput())*(motor.getBusVoltage()));

@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.CANBus;
 
@@ -38,6 +39,7 @@ import frc.robot.Constants.RobotType;
 import frc.robot.util.MapleSimUtil;
 
 public class RobotContainer {
+    private LoggedDashboardChooser<Command> autoChooser_ = new LoggedDashboardChooser<>("Auto choices");
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     private SparkMax testSparkMax;
     private Drive drive;
@@ -58,6 +60,9 @@ public class RobotContainer {
             () -> -gamepad_.getLeftX(),
             () -> -gamepad_.getRightX()
         );
+
+        autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
+
         configureBindings();   
         configureDriveBindings(); 
 
@@ -70,6 +75,7 @@ public class RobotContainer {
 
     private void configureDriveBindings(){
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
+      gamepad_.y().onTrue(drive.zeroGyro());
     }
 
 
@@ -96,7 +102,7 @@ public class RobotContainer {
 
     private void buildSimBot() {
       testSparkMax = new SparkMax(new SparkMaxSimIO( 6));
-      drive= new Drive(null);
+      drive= new Drive(new NavXIO());
     }
 
     private void buildComp() {
