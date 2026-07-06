@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
-import frc.robot.generated.CompTunerConstants;
 import frc.robot.subsystems.drive.GyroIO.GyroIOInputs;
 import frc.robot.util.LoggedTracer;
 
@@ -58,7 +57,7 @@ public class Drive extends SubsystemBase{
   private Rotation2d gyroRotation= Rotation2d.kZero;
   private MecanumDrivePoseEstimator poseEstimator;
   private Rotation2d gyroOffset = Rotation2d.kZero;
-  private RobotConfig config;
+  public RobotConfig config;
   private MecanumDriveWheelPositions lastWheels= new MecanumDriveWheelPositions(
     0,0,0,0
   );
@@ -114,8 +113,8 @@ public class Drive extends SubsystemBase{
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards)-> bypassDuty(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(0.001, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(0.001, 0.0, 0.0) // Rotation PID constants
             ),
             config, // The robot configuration
             () -> {

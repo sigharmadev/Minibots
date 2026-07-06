@@ -36,6 +36,7 @@ import frc.robot.subsystems.test.SparkMax;
 import frc.robot.subsystems.test.SparkMaxSimIO;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
+import frc.robot.commands.AutoCommands;
 import frc.robot.util.MapleSimUtil;
 
 public class RobotContainer {
@@ -43,8 +44,6 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     private SparkMax testSparkMax;
     private Drive drive;
-    private SparkMax secondTestSparkMax;
-    private CANBus roborioCANBus = new CANBus();
 
     public RobotContainer() {
         buildRobot() ;
@@ -62,7 +61,7 @@ public class RobotContainer {
         );
 
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
-
+        autoChooser_.addDefaultOption("Test Auto", AutoCommands.test(drive));
         configureBindings();   
         configureDriveBindings(); 
 
@@ -80,7 +79,7 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser_.get();
     }
 
     private void buildRobot() {
