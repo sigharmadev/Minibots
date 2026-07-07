@@ -172,7 +172,11 @@ public class DriveCommands {
   public static Command followPathCommand(String pathName, Drive drive) {
     try{
         PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
-        return AutoBuilder.followPath(path);
+        var startingPose= path.getStartingHolonomicPose().orElseThrow();
+        return Commands.sequence(
+          Commands.runOnce(()-> drive.resetPose(startingPose)),
+          AutoBuilder.followPath(path)
+        );
         
     } catch (Exception e) {
         DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
