@@ -113,8 +113,8 @@ public class Drive extends SubsystemBase{
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards)-> bypassDuty(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(0.001, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(0.001, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             ),
             config, // The robot configuration
             () -> {
@@ -142,9 +142,12 @@ public class Drive extends SubsystemBase{
     lastWheels= new MecanumDriveWheelPositions(mecanum[1].getWheelPositions(), mecanum[0].getWheelPositions(),
     mecanum[2].getWheelPositions(), mecanum[3].getWheelPositions());
     //Getting new gyro rotation
-    gyroRotation= gyroInputs.yawPosition;
+    gyroRotation= getRotation();
     //Updating robot pose
     poseEstimator.update(gyroRotation, lastWheels);
+    Logger.recordOutput("Pose/x", poseEstimator.getEstimatedPosition().getX());
+    Logger.recordOutput("Pose/y", poseEstimator.getEstimatedPosition().getY());
+    Logger.recordOutput("Pose/theta", poseEstimator.getEstimatedPosition().getRotation().getRadians());
   }
 
   public void stop(){
