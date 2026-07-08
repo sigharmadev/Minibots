@@ -160,7 +160,7 @@ public class DriveCommands {
 
           drive.bypassDuty(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, drive.getRotation()
+              speeds, drive.getRotation().unaryMinus()
               )
           );
         },
