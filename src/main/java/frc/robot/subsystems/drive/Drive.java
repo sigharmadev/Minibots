@@ -235,6 +235,10 @@ public class Drive extends SubsystemBase{
     return Commands.runOnce(()->this.gyroOffset = gyroInputs.yawPosition);
   }
 
+  public Command zeroPose(){
+    return Commands.runOnce(()-> resetPose(new Pose2d(0,0, new Rotation2d(0))));
+  }
+
   public Pose2d getPose(){
     return poseEstimator.getEstimatedPosition();
   }

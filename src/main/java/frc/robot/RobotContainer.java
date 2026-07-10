@@ -62,19 +62,21 @@ public class RobotContainer {
 
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.addDefaultOption("Test Auto", AutoCommands.test(drive));
+        autoChooser_.addOption("Straight", AutoCommands.straight(drive, testSparkMax));
         configureBindings();   
         configureDriveBindings(); 
 
     }
 
     private void configureBindings() {   
-      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.7));
-      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.7));
+      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.85));
+      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.85));
     }
 
     private void configureDriveBindings(){
       drive.setDefaultCommand(DriveCommands.joystickDrive().withName("JoystickDrive"));
       gamepad_.y().onTrue(drive.zeroGyro());
+      gamepad_.b().onTrue(drive.zeroPose());
     }
 
 
