@@ -21,7 +21,7 @@ public class AutoCommands {
             drive.zeroGyro(),
             DriveCommands.joystickDriveRobot(drive, ()->0.8, ()->-0.15, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(1.0),
             DriveCommands.joystickDriveRobot(drive, ()-> 0.2, ()->0.0, ()-> 0.6).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.35),
-            DriveCommands.joystickDriveRobot(drive, ()->0.9, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.65),
+            DriveCommands.joystickDriveRobot(drive, ()->1.0, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.65),
             DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()-> 0.7).withTimeout(0.5),
             DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.12, ()-> 0.0).withTimeout(0.8),
             DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(0.4),
@@ -51,9 +51,9 @@ public class AutoCommands {
             DriveCommands.joystickDriveRobot(drive, ()-> 0.2, ()->0.0, ()-> 0.6).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.35),
             DriveCommands.joystickDriveRobot(drive, ()->0.9, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.65),
             DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()-> 0.7).withTimeout(0.5),
-            DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.12, ()-> 0.0).withTimeout(1.05),
-            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(0.4),
-            DriveCommands.joystickDriveRobot(drive, ()->0.6, ()-> 0.0, ()-> 0.0).deadlineFor(testSpark.bypass(-1.0)).withTimeout(0.75),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.12, ()-> 0.0).withTimeout(0.90),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(0.53),
+            DriveCommands.joystickDriveRobot(drive, ()->0.7, ()-> 0.0, ()-> 0.0).deadlineFor(testSpark.bypass(-1.0)).withTimeout(0.85),
             //testSpark.bypass(-1.0).withTimeout(1.0),
             DriveCommands.joystickDriveRobot(drive, ()->-0.8, ()-> 0.0, ()-> 0.0).withTimeout(1)
         );
