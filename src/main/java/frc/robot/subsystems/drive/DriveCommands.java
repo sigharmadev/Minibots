@@ -123,17 +123,17 @@ public class DriveCommands {
    * Robot relative drive command using two joysticks (controlling linear and
    * angular velocities). This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
    */
-  public static Command joystickDrive() {
+  public static Command joystickDriveField() {
     if (!configured) throw new IllegalStateException("DriveCommands joystickDrive called without first configuring!");
     
-    return joystickDrive(drive_, xSupplier_, ySupplier_, omegaSupplier_);
+    return joystickDriveField(drive_, xSupplier_, ySupplier_, omegaSupplier_);
   }
 
   /**
    * Robot relative drive command using two joysticks (controlling linear and
    * angular velocities).
    */
-  public static Command joystickDrive(
+  public static Command joystickDriveField(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -162,6 +162,45 @@ public class DriveCommands {
               ChassisSpeeds.fromFieldRelativeSpeeds(
               speeds, drive.getRotation().unaryMinus()
               )
+          );
+        },
+        drive::stop
+    );
+  }
+
+  public static Command joystickDriveRobot() {
+    if (!configured) throw new IllegalStateException("DriveCommands joystickDrive called without first configuring!");
+    
+    return joystickDriveRobot(drive_, xSupplier_, ySupplier_, omegaSupplier_);
+  }
+
+  public static Command joystickDriveRobot(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    return drive.runEnd(
+        () -> {
+          // Get linear velocity
+          Translation2d linearVelocity = getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+          // Square rotation value for more precise control
+          //omega = Math.copySign(omega * omega, omega);
+
+          // Convert to field relative speeds & send command
+          ChassisSpeeds speeds = new ChassisSpeeds(
+              linearVelocity.getX() * drive.getMaxLinearSpeed(),
+              linearVelocity.getY() * drive.getMaxLinearSpeed(),
+              omega * drive.getMaxAngularSpeed());
+              Logger.recordOutput("Omega/Supplier", omega);
+          boolean isFlipped = DriverStation.getAlliance().isPresent()
+              && DriverStation.getAlliance().get() == Alliance.Red;
+
+          drive.bypassDuty(
+            speeds
           );
         },
         drive::stop

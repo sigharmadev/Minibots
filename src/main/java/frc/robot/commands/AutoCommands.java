@@ -16,9 +16,46 @@ public class AutoCommands {
         );
     }
 
-    public static Command straight(Drive drive, SparkMax testSpark){
+    public static Command redSideClose(Drive drive, SparkMax testSpark){
         return Commands.sequence(
-            DriveCommands.joystickDrive(drive, ()->0.8, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(0.8)).withTimeout(3)
+            drive.zeroGyro(),
+            DriveCommands.joystickDriveRobot(drive, ()->0.8, ()->-0.15, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(1.0),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.2, ()->0.0, ()-> 0.6).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.35),
+            DriveCommands.joystickDriveRobot(drive, ()->0.9, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.65),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()-> 0.7).withTimeout(0.5),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.12, ()-> 0.0).withTimeout(0.8),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(0.4),
+            DriveCommands.joystickDriveRobot(drive, ()->0.7, ()-> 0.0, ()-> 0.0).deadlineFor(testSpark.bypass(-1.0)).withTimeout(0.6),
+            testSpark.bypass(-1.0).withTimeout(1.0),
+            DriveCommands.joystickDriveRobot(drive, ()->-0.8, ()-> 0.0, ()-> 0.0).withTimeout(1)
+        );
+    }
+    public static Command redSide(Drive drive, SparkMax testSpark){
+        return Commands.sequence(
+            drive.zeroGyro(),
+            DriveCommands.joystickDriveRobot(drive, ()->0.8, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(1.0),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.2, ()->0.0, ()-> 0.6).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.35),
+            DriveCommands.joystickDriveRobot(drive, ()->0.9, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.75),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()-> 0.7).withTimeout(0.5),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.2, ()-> 0.0).withTimeout(0.8),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(1),
+            DriveCommands.joystickDriveRobot(drive, ()->0.6, ()-> 0.0, ()-> 0.0).deadlineFor(testSpark.bypass(-1.0)).withTimeout(0.6),
+            DriveCommands.joystickDriveRobot(drive, ()->-0.8, ()-> 0.0, ()-> 0.0).withTimeout(1)
+        );
+    }
+
+    public static Command blueSide(Drive drive, SparkMax testSpark){
+        return Commands.sequence(
+            drive.zeroGyro(),
+            DriveCommands.joystickDriveRobot(drive, ()->0.8, ()->-0.15, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(1.0),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.2, ()->0.0, ()-> 0.6).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.35),
+            DriveCommands.joystickDriveRobot(drive, ()->0.9, ()->0.0, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(0.65),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()-> 0.7).withTimeout(0.5),
+            DriveCommands.joystickDriveRobot(drive, ()-> 0.8, ()-> 0.12, ()-> 0.0).withTimeout(1.05),
+            DriveCommands.joystickDriveRobot(drive, ()->0.0, ()-> 0.0, ()->-0.7).withTimeout(0.4),
+            DriveCommands.joystickDriveRobot(drive, ()->0.6, ()-> 0.0, ()-> 0.0).deadlineFor(testSpark.bypass(-1.0)).withTimeout(0.75),
+            //testSpark.bypass(-1.0).withTimeout(1.0),
+            DriveCommands.joystickDriveRobot(drive, ()->-0.8, ()-> 0.0, ()-> 0.0).withTimeout(1)
         );
     }
 }
