@@ -120,7 +120,7 @@ public class DriveCommands {
   }
 
   /**
-   * Robot relative drive command using two joysticks (controlling linear and
+   * Field relative drive command using two joysticks (controlling linear and
    * angular velocities). This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
    */
   public static Command joystickDriveField() {
@@ -130,7 +130,7 @@ public class DriveCommands {
   }
 
   /**
-   * Robot relative drive command using two joysticks (controlling linear and
+   * Field relative drive command using two joysticks (controlling linear and
    * angular velocities).
    */
   public static Command joystickDriveField(
@@ -206,6 +206,7 @@ public class DriveCommands {
         drive::stop
     );
   }
+  
   
   
   public static Command followPathCommand(String pathName, Drive drive) {

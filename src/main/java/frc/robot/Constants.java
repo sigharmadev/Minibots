@@ -27,7 +27,7 @@ public class Constants {
     }
     
     // This is the current robot type, change for running on real robot
-    private static final RobotType robotType = RobotType.COMPETITION;   
+    private static final RobotType robotType = RobotType.SIMBOT;   
     
     // This is only a fallback! This will not change the robot type.
     private static final RobotType defaultRobotType = RobotType.COMPETITION;
