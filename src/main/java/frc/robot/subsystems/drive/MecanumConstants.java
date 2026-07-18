@@ -10,9 +10,9 @@ public class MecanumConstants {
     public static final boolean ENCODER_INVERTED = false;
 
     //Change these for later when tuning
-    public static final double kP= 0.0055; 
-    public static final double kI= 0.0;
-    public static final double kD= 0.0;
+    public static final double kP= 0.0009; 
+    public static final double kI= 0.00001;
+    public static final double kD= 0.01;
     public static final double kS= 0.0;
     public static final double kV= 0.0;
     public static final double kA= 0.0;

@@ -28,7 +28,7 @@ public class MecanumHardwareIO implements MecanumIO {
     private AngularVelocity velocityDebug=RPM.of(0);
     private int inputsDebug= 0;
 
-    public MecanumHardwareIO(int CanID, boolean motorInverted) {
+    public MecanumHardwareIO(int CanID, boolean motorInverted, boolean encoderInverted) {
         motor= new SparkMax(CanID, MotorType.kBrushed);
         motorController= motor.getClosedLoopController();
         motorEncoder = motor.getEncoder();
@@ -36,8 +36,8 @@ public class MecanumHardwareIO implements MecanumIO {
         SparkMaxConfig motorConfig= new SparkMaxConfig();
 
         motorConfig.encoder
-            .countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION);
-            //.inverted(MecanumConstants.ENCODER_INVERTED);
+            .countsPerRevolution(MecanumConstants.ENCODER_COUNTS_PER_REVOLUTION)
+            .inverted(encoderInverted);
 
         motorConfig
             .idleMode(IdleMode.kBrake)

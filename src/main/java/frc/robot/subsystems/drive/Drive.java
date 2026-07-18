@@ -69,16 +69,16 @@ public class Drive extends SubsystemBase{
     wheelLocations[2], wheelLocations[3]);
     this.gyro = gyro; 
     if (Constants.getRobot() == RobotType.COMPETITION) {
-      mecanum[0] = new Mecanum(new MecanumHardwareIO(1, false), "FrontRight");
-      mecanum[1] = new Mecanum(new MecanumHardwareIO(2, true), "FrontLeft");
-      mecanum[2] = new Mecanum(new MecanumHardwareIO(3, true), "BackLeft");
-      mecanum[3] = new Mecanum(new MecanumHardwareIO(4, false), "BackRight");
+      mecanum[0] = new Mecanum(new MecanumHardwareIO(1, false, false), "FrontRight");
+      mecanum[1] = new Mecanum(new MecanumHardwareIO(2, true, true), "FrontLeft");
+      mecanum[2] = new Mecanum(new MecanumHardwareIO(3, true, true), "BackLeft");
+      mecanum[3] = new Mecanum(new MecanumHardwareIO(4, false, false), "BackRight");
   
     } else {
-      mecanum[0] = new Mecanum(new MecanumSimIO(1, false), "FrontRight");
-      mecanum[1] = new Mecanum(new MecanumSimIO(2, true), "FrontLeft");
-      mecanum[2] = new Mecanum(new MecanumSimIO(3, true), "BackLeft");
-      mecanum[3] = new Mecanum(new MecanumSimIO(4, false), "BackRight");
+      mecanum[0] = new Mecanum(new MecanumSimIO(1, false, false), "FrontRight");
+      mecanum[1] = new Mecanum(new MecanumSimIO(2, true, true), "FrontLeft");
+      mecanum[2] = new Mecanum(new MecanumSimIO(3, true, true), "BackLeft");
+      mecanum[3] = new Mecanum(new MecanumSimIO(4, false, false ), "BackRight");
     }
     
     poseEstimator= new MecanumDrivePoseEstimator(kinematics, gyroRotation, 
@@ -113,8 +113,8 @@ public class Drive extends SubsystemBase{
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards)-> runVelocity(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(3.5, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(5.0, 5.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 5.0, 0.0) // Rotation PID constants
             ),
             config, // The robot configuration
             () -> {

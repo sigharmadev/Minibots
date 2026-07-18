@@ -16,9 +16,9 @@ public class MecanumSimIO extends MecanumHardwareIO {
     //Create new dc motor object based on specifications of exact motor 
     private static final DCMotor goBildaCore = new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1);
 
-    public MecanumSimIO(int canID, boolean motorInverted) {
+    public MecanumSimIO(int canID, boolean motorInverted, boolean encoderInverted) {
         // Pass to hardware class constructor (initializes your SparkMax reference)
-        super(canID, motorInverted); 
+        super(canID, motorInverted, encoderInverted); 
 
         motorSim = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(
