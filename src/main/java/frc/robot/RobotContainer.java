@@ -31,6 +31,10 @@ import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.MecanumSimIO;
 import frc.robot.subsystems.drive.NavXIO;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotConstants;
+import frc.robot.subsystems.pivot.PivotMotorIO;
+import frc.robot.subsystems.pivot.PivotSimIO;
 import frc.robot.subsystems.test.MotorIOSparkMax;
 import frc.robot.subsystems.test.SparkMax;
 import frc.robot.subsystems.test.SparkMaxSimIO;
@@ -44,6 +48,7 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     private SparkMax testSparkMax;
     private Drive drive;
+    private Pivot pivot;
 
     public RobotContainer() {
         buildRobot() ;
@@ -71,8 +76,11 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-      gamepad_.leftTrigger().whileTrue(testSparkMax.bypass(0.85));
-      gamepad_.rightTrigger().whileTrue(testSparkMax.bypass(-0.85));
+      if(pivot.inputs.motorAngle==(PivotConstants.deploySetpoint-5.0)||pivot.inputs.motorAngle==(PivotConstants.deploySetpoint+5.0)){
+        gamepad_.a().onTrue(pivot.stowCommand());
+      } else{
+        gamepad_.a().onTrue(pivot.deployCommand());
+      }
     }
 
     private void configureDriveBindings(){
@@ -104,18 +112,21 @@ public class RobotContainer {
     }
 
     private void buildSimBot() {
-      testSparkMax = new SparkMax(new SparkMaxSimIO( 6));
       drive= new Drive(new NavXIO());
+      pivot= new Pivot(new PivotSimIO(6, false, false));
     }
 
     private void buildComp() {
-      testSparkMax = new SparkMax(new MotorIOSparkMax(6));    
       drive= new Drive(new NavXIO());
+      pivot= new Pivot(new PivotMotorIO(6, false, false));
     }
 
     private void createDefaultSubsystems() {
-      if(testSparkMax == null) {
-        testSparkMax= new SparkMax(new MotorIOSparkMax(6));
+      if(pivot==null){
+        pivot= new Pivot(new PivotMotorIO(6, false, false));
+      }
+      if(drive==null){
+        drive= new Drive(new NavXIO());
       }
     }
 }
