@@ -22,27 +22,22 @@ public class Pivot extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("Test", inputs);
-        Logger.recordOutput("Test/MotorRPMSetPoint", PivotConstants.velocitySetpoint);
+        Logger.processInputs("Pivot", inputs);
     }
 
-    public void test(AngularVelocity velocity) {
-        io.test(velocity);
+    public void deploy(){
+        io.setAngle(PivotConstants.deploySetpoint);
     }
 
-    public Command bypass(double dutycycle){
-        return Commands.startEnd(() -> io.bypass(dutycycle), this::stop);
+    public void stow(){
+        io.setAngle(60);
     }
 
-    public void runVelocitySetpoint() {
-        test(PivotConstants.velocitySetpoint);
+    public Command deployCommand() {
+        return Commands.runOnce(this::deploy, this);
     }
 
-    public void stop() {
-        io.test(RPM.of(0));
-    }
-
-    public Command testCommand() {
-        return Commands.startEnd(() -> runVelocitySetpoint(), this::stop);
+    public Command stowCommand(){
+        return Commands.runOnce(this::stow, this);
     }
 }

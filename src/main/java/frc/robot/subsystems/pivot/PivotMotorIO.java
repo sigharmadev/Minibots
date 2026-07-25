@@ -18,55 +18,53 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class PivotMotorIO implements PivotIO {
-    SparkMax cim;
-    SparkClosedLoopController cimController;
-    RelativeEncoder cimEncoder;
+    SparkMax pivot;
+    SparkClosedLoopController pivotController;
+    RelativeEncoder pivotEncoder;
 
-    public PivotMotorIO(int CanID) {
-        cim = new SparkMax(CanID, MotorType.kBrushed);
-        cimController = cim.getClosedLoopController();
-        cimEncoder = cim.getEncoder();
+    public PivotMotorIO(int CanID, boolean motorInverted, boolean encoderInverted) {
+        pivot = new SparkMax(CanID, MotorType.kBrushed);
+        pivotController = pivot.getClosedLoopController();
+        pivotEncoder = pivot.getEncoder();
 
-        SparkMaxConfig cimConfig= new SparkMaxConfig();
+        SparkMaxConfig pivotConfig= new SparkMaxConfig();
 
-        cimConfig.encoder.countsPerRevolution(PivotConstants.ENCODER_COUNTS_PER_REVOLUTION)
-        .inverted(PivotConstants.ENCODER_INVERTED);
-
-        cimConfig.closedLoop.
+        pivotConfig.encoder.countsPerRevolution(PivotConstants.ENCODER_COUNTS_PER_REVOLUTION)
+        .inverted(encoderInverted);
+        pivotConfig.closedLoop.
         p(PivotConstants.kP)
         .i(PivotConstants.kI)
-        .d(PivotConstants.kD);
+        .d(PivotConstants.kD); 
 
-        cimConfig.closedLoop.feedForward.
+        pivotConfig.closedLoop.feedForward.
         kS(PivotConstants.kS)
         .kV(PivotConstants.kV)
         .kA(PivotConstants.kA);
 
-        cimConfig.closedLoop.maxMotion.
+        pivotConfig.closedLoop.maxMotion.
         cruiseVelocity(PivotConstants.cruiseVelocity)
         .maxAcceleration(PivotConstants.acceleration)
         .allowedProfileError(PivotConstants.allowedProfileError);
 
-        cimConfig.inverted(true);
+        pivotConfig.inverted(motorInverted);
 
-        cimConfig.smartCurrentLimit(9);
+        pivotConfig.smartCurrentLimit(9);
          
-        cim.configure(cimConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivot.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    @Override
-    public void test(AngularVelocity velocity){
-        cimController.setSetpoint(velocity.in(RPM), ControlType.kMAXMotionVelocityControl);
-    }
-    @Override
-    public void bypass(double dutycycle){
-        cim.set(dutycycle);
-    }
+
 
     @Override 
     public void updateInputs(PivotIOInputs inputs) {
-        inputs.motorRPM = cimEncoder.getVelocity();
-        inputs.motorCurrent = Amps.of(cim.getOutputCurrent());
-        inputs.voltageApplied= Volts.of((cim.getAppliedOutput())*(cim.getBusVoltage()));
+        inputs.motorRPM = pivotEncoder.getVelocity();
+        inputs.motorCurrent = Amps.of(pivot.getOutputCurrent());
+        inputs.voltageApplied= Volts.of((pivot.getAppliedOutput())*(pivot.getBusVoltage()));
+        inputs.motorAngle= pivotEncoder.getPosition();
+    }
+
+    @Override
+    public void setAngle(double setpoint) {
+        pivotController.setSetpoint(setpoint, ControlType.kPosition);
     }
 }

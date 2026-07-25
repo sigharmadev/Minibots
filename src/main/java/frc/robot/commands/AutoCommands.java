@@ -12,11 +12,11 @@ public class AutoCommands {
     public static Command test(Drive drive){
         return Commands.sequence(
             drive.zeroGyro(),
-            DriveCommands.followPathCommand("Test", drive)
+            DriveCommands.followPathCommand("BlueForward", drive)
         );
     }
 
-    public static Command redSideClose(Drive drive, SparkMax testSpark){
+    /*public static Command redSideClose(Drive drive, SparkMax testSpark){
         return Commands.sequence(
             drive.zeroGyro(),
             DriveCommands.joystickDriveRobot(drive, ()->0.8, ()->-0.15, ()->0.0).deadlineFor(testSpark.bypass(1.0)).withTimeout(1.0),
@@ -57,5 +57,5 @@ public class AutoCommands {
             //testSpark.bypass(-1.0).withTimeout(1.0),
             DriveCommands.joystickDriveRobot(drive, ()->-0.8, ()-> 0.0, ()-> 0.0).withTimeout(1)
         );
-    }
+    }*/
 }

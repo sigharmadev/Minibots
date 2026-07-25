@@ -67,20 +67,15 @@ public class RobotContainer {
 
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.addDefaultOption("Test Auto", AutoCommands.test(drive));
-        autoChooser_.addOption("RedSideClose", AutoCommands.redSideClose(drive, testSparkMax));
-        autoChooser_.addOption("RedSideFar", AutoCommands.redSide(drive, testSparkMax));
-        autoChooser_.addOption("BlueSideRight", AutoCommands.blueSide(drive, testSparkMax));
         configureBindings();   
         configureDriveBindings(); 
 
     }
 
     private void configureBindings() {   
-      if(pivot.inputs.motorAngle==(PivotConstants.deploySetpoint-5.0)||pivot.inputs.motorAngle==(PivotConstants.deploySetpoint+5.0)){
         gamepad_.a().onTrue(pivot.stowCommand());
-      } else{
-        gamepad_.a().onTrue(pivot.deployCommand());
-      }
+        gamepad_.x().onTrue(pivot.deployCommand());
+      
     }
 
     private void configureDriveBindings(){
@@ -88,8 +83,7 @@ public class RobotContainer {
       gamepad_.y().onTrue(drive.zeroGyro());
       gamepad_.b().onTrue(drive.zeroPose());
     }
-
-
+    
     public Command getAutonomousCommand() {
         return autoChooser_.get();
     }

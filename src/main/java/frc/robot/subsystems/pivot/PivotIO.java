@@ -1,6 +1,7 @@
 package frc.robot.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -14,13 +15,12 @@ public interface PivotIO {
 
     public static class PivotIOInputs{
         public Current motorCurrent = Amps.zero();
+        public double motorAngle= 0.0;
         public double motorRPM = 0.0;
         public Voltage voltageApplied= Volts.of(0.0);
     }
 
     public default void updateInputs(PivotIOInputs inputs) {}
 
-    public default void test(AngularVelocity velocity) {}
-
-    public default void bypass(double dutycycle){}
+    public default void setAngle(double setpoint){}
 }

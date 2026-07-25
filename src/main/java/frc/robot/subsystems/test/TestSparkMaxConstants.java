@@ -4,9 +4,7 @@ import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class TestSparkMaxConstants {
-    public static final int CIM_MOTOR_ID = 2;
-    public static final int ENCODER_COUNTS_PER_REVOLUTION = 2150;
-    public static final boolean ENCODER_INVERTED = true;
+    public static final int ENCODER_COUNTS_PER_REVOLUTION = 538;
 
     public static final double kP= 0.0025;
     public static final double kI= 0.0;

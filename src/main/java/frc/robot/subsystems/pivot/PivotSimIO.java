@@ -16,8 +16,8 @@ public class PivotSimIO extends PivotMotorIO {
     private final DCMotorSim motorSim;
     private final SparkMaxSim sparkSim;
 
-    public PivotSimIO(int canID) {
-        super(canID);
+    public PivotSimIO(int canID, boolean motorInverted, boolean encoderInverted) {
+        super(canID, motorInverted, encoderInverted);
         motorSim = new DCMotorSim( LinearSystemId.createDCMotorSystem(
            new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),PivotConstants.MOI,
             PivotConstants.GearRatio
@@ -25,13 +25,13 @@ public class PivotSimIO extends PivotMotorIO {
             new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
 
-        sparkSim = new SparkMaxSim(cim,new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
+        sparkSim = new SparkMaxSim(pivot,new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
     }
 
     @Override
     public void updateInputs(PivotIOInputs inputs) {
-        double appliedVolts = cim.getAppliedOutput() * RobotController.getBatteryVoltage();
+        double appliedVolts = pivot.getAppliedOutput() * RobotController.getBatteryVoltage();
 
         motorSim.setInputVoltage(appliedVolts);
         motorSim.update(0.02);

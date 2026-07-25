@@ -84,6 +84,8 @@ public class Drive extends SubsystemBase{
     poseEstimator= new MecanumDrivePoseEstimator(kinematics, gyroRotation, 
       lastWheels,
       Pose2d.kZero);
+    
+    odometry= new MecanumDriveOdometry(kinematics, gyroRotation, lastWheels, Pose2d.kZero);
 
     config= new RobotConfig(
       Config.MASS_KG_ROBOT,
@@ -145,6 +147,9 @@ public class Drive extends SubsystemBase{
     gyroRotation= getRotation();
     //Updating robot pose
     poseEstimator.update(gyroRotation, lastWheels);
+
+    //Updating odometry
+    odometry.update(gyroRotation, lastWheels);
     Logger.recordOutput("Pose/x", poseEstimator.getEstimatedPosition().getX());
     Logger.recordOutput("Pose/y", poseEstimator.getEstimatedPosition().getY());
     Logger.recordOutput("Pose/theta", poseEstimator.getEstimatedPosition().getRotation().getRadians());
@@ -241,10 +246,12 @@ public class Drive extends SubsystemBase{
 
   public Pose2d getPose(){
     return poseEstimator.getEstimatedPosition();
+    //return odometry.getPoseMeters();
   }
 
   public void resetPose(Pose2d pose){
     poseEstimator.resetPosition(getRotation(), lastWheels, pose);
+    //odometry.resetPosition(getRotation(), lastWheels, pose);
   }
 
   public ChassisSpeeds getChassisSpeeds(){

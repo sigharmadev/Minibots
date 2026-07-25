@@ -29,8 +29,7 @@ public class MotorIOSparkMax implements TestSparkMaxIO {
 
         SparkMaxConfig cimConfig= new SparkMaxConfig();
 
-        cimConfig.encoder.countsPerRevolution(TestSparkMaxConstants.ENCODER_COUNTS_PER_REVOLUTION)
-        .inverted(TestSparkMaxConstants.ENCODER_INVERTED);
+        cimConfig.encoder.countsPerRevolution(TestSparkMaxConstants.ENCODER_COUNTS_PER_REVOLUTION);
 
         cimConfig.closedLoop.
         p(TestSparkMaxConstants.kP)
