@@ -1,4 +1,4 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.Elevator;
 
 import static edu.wpi.first.units.Units.RPM;
 
@@ -11,22 +11,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Pivot extends SubsystemBase {
-    private final PivotIO io;
-    public final PivotIOInputsAutoLogged inputs= new PivotIOInputsAutoLogged();
+public class Elevator extends SubsystemBase {
+    private final ElevatorIO io;
+    public final ElevatorIOInputsAutoLogged inputs= new ElevatorIOInputsAutoLogged();
 
-    public Pivot(PivotIO io) {
+    public Elevator(ElevatorIO io) {
         this.io = io;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("Pivot", inputs);
+        Logger.processInputs("Elevator", inputs);
     }
 
     public void deploy(){
-        io.setAngle(PivotConstants.deploySetpoint);
+        io.setAngle(ElevatorConstants.deploySetpoint);
     }
 
     public void stow(){

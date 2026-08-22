@@ -1,9 +1,9 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.Elevator;
 
 import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.units.measure.AngularVelocity;
 
-public class PivotConstants {
+public class ElevatorConstants {
     public static final int ENCODER_COUNTS_PER_REVOLUTION = 538;
 
     public static final double kP= 0.8;

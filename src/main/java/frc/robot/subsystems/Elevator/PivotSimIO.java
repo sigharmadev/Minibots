@@ -1,4 +1,4 @@
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.Elevator;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
@@ -12,26 +12,26 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class PivotSimIO extends PivotMotorIO {
+public class PivotSimIO extends ElevatorMotorIO {
     private final DCMotorSim motorSim;
     private final SparkMaxSim sparkSim;
 
     public PivotSimIO(int canID, boolean motorInverted, boolean encoderInverted) {
         super(canID, motorInverted, encoderInverted);
         motorSim = new DCMotorSim( LinearSystemId.createDCMotorSystem(
-           new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),PivotConstants.MOI,
-            PivotConstants.GearRatio
+           new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),ElevatorConstants.MOI,
+            ElevatorConstants.GearRatio
             ),
             new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
 
-        sparkSim = new SparkMaxSim(pivot,new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
+        sparkSim = new SparkMaxSim(Elevator,new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1)
         );
     }
 
     @Override
-    public void updateInputs(PivotIOInputs inputs) {
-        double appliedVolts = pivot.getAppliedOutput() * RobotController.getBatteryVoltage();
+    public void updateInputs(ElevatorIOInputs inputs) {
+        double appliedVolts = Elevator.getAppliedOutput() * RobotController.getBatteryVoltage();
 
         motorSim.setInputVoltage(appliedVolts);
         motorSim.update(0.02);

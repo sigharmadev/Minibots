@@ -31,10 +31,10 @@ import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.MecanumSimIO;
 import frc.robot.subsystems.drive.NavXIO;
-import frc.robot.subsystems.pivot.Pivot;
-import frc.robot.subsystems.pivot.PivotConstants;
-import frc.robot.subsystems.pivot.PivotMotorIO;
-import frc.robot.subsystems.pivot.PivotSimIO;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorConstants;
+import frc.robot.subsystems.Elevator.ElevatorMotorIO;
+import frc.robot.subsystems.Elevator.PivotSimIO;
 import frc.robot.subsystems.test.MotorIOSparkMax;
 import frc.robot.subsystems.test.SparkMax;
 import frc.robot.subsystems.test.SparkMaxSimIO;
@@ -48,7 +48,7 @@ public class RobotContainer {
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
     private SparkMax testSparkMax;
     private Drive drive;
-    private Pivot pivot;
+    private Elevator pivot;
 
     public RobotContainer() {
         buildRobot() ;
@@ -107,17 +107,17 @@ public class RobotContainer {
 
     private void buildSimBot() {
       drive= new Drive(new NavXIO());
-      pivot= new Pivot(new PivotSimIO(6, false, false));
+      pivot= new Elevator(new PivotSimIO(6, false, false));
     }
 
     private void buildComp() {
       drive= new Drive(new NavXIO());
-      pivot= new Pivot(new PivotMotorIO(6, false, false));
+      pivot= new Elevator(new ElevatorMotorIO(6, false, false));
     }
 
     private void createDefaultSubsystems() {
       if(pivot==null){
-        pivot= new Pivot(new PivotMotorIO(6, false, false));
+        pivot= new Elevator(new ElevatorMotorIO(6, false, false));
       }
       if(drive==null){
         drive= new Drive(new NavXIO());
