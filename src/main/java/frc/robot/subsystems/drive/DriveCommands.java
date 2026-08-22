@@ -159,9 +159,7 @@ public class DriveCommands {
               && DriverStation.getAlliance().get() == Alliance.Red;
 
           drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds, drive.getRotation().unaryMinus()
-              )
+              speeds
           );
         },
         drive::stop
@@ -198,7 +196,7 @@ public class DriveCommands {
               Logger.recordOutput("Omega/Supplier", omega);
           boolean isFlipped = DriverStation.getAlliance().isPresent()
               && DriverStation.getAlliance().get() == Alliance.Red;
-
+          
           drive.bypassDuty(
             speeds
           );

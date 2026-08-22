@@ -12,11 +12,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class PivotSimIO extends ElevatorMotorIO {
+public class ElevatorSimIO extends ElevatorMotorIO {
     private final DCMotorSim motorSim;
     private final SparkMaxSim sparkSim;
 
-    public PivotSimIO(int canID, boolean motorInverted, boolean encoderInverted) {
+    public ElevatorSimIO(int canID, boolean motorInverted, boolean encoderInverted) {
         super(canID, motorInverted, encoderInverted);
         motorSim = new DCMotorSim( LinearSystemId.createDCMotorSystem(
            new DCMotor(12, 24.3, 9.2, 0.25, (104*Math.PI), 1),ElevatorConstants.MOI,

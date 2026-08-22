@@ -34,7 +34,7 @@ import frc.robot.subsystems.drive.NavXIO;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorMotorIO;
-import frc.robot.subsystems.Elevator.PivotSimIO;
+import frc.robot.subsystems.Elevator.ElevatorSimIO;
 import frc.robot.subsystems.test.MotorIOSparkMax;
 import frc.robot.subsystems.test.SparkMax;
 import frc.robot.subsystems.test.SparkMaxSimIO;
@@ -67,6 +67,7 @@ public class RobotContainer {
 
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.addDefaultOption("Test Auto", AutoCommands.test(drive));
+        autoChooser_.addOption("Drive Forward", AutoCommands.forward(drive));
         configureBindings();   
         configureDriveBindings(); 
 
@@ -107,7 +108,7 @@ public class RobotContainer {
 
     private void buildSimBot() {
       drive= new Drive(new NavXIO());
-      pivot= new Elevator(new PivotSimIO(6, false, false));
+      pivot= new Elevator(new ElevatorSimIO(6, false, false));
     }
 
     private void buildComp() {

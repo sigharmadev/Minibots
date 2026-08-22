@@ -175,8 +175,12 @@ public class Drive extends SubsystemBase{
     mecanum[1].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
     mecanum[2].setSetpoint(wheelSpeeds.rearLeftMetersPerSecond);
     mecanum[3].setSetpoint(wheelSpeeds.rearRightMetersPerSecond);
+
+    Logger.recordOutput("Setpoints/FrontRight", wheelSpeeds.frontRightMetersPerSecond);
+    Logger.recordOutput("Setpoints/FrontLeft", wheelSpeeds.frontLeftMetersPerSecond);
+    Logger.recordOutput("Setpoints/RearRight", wheelSpeeds.rearRightMetersPerSecond);
+    Logger.recordOutput("Setpoints/RearLeft", wheelSpeeds.rearLeftMetersPerSecond);
     
-    Logger.recordOutput("DebugDev", debug);
   }
 
 
