@@ -68,6 +68,7 @@ public class RobotContainer {
         autoChooser_ = new LoggedDashboardChooser<>("Auto Choices");
         autoChooser_.addDefaultOption("Test Auto", AutoCommands.test(drive));
         autoChooser_.addOption("Drive Forward", AutoCommands.forward(drive));
+        autoChooser_.addOption("Strafe ", AutoCommands.strafe(drive));
         configureBindings();   
         configureDriveBindings(); 
 

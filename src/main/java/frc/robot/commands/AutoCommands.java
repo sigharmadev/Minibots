@@ -64,4 +64,10 @@ public class AutoCommands {
             DriveCommands.joystickDriveRobot(drive, ()->1.0, ()->0.0, ()->0.0).withTimeout(2.0)
         );
     }
+
+    public static Command strafe(Drive drive){
+        return Commands.sequence(
+            DriveCommands.joystickDriveRobot(drive, ()->0, ()-> 1.0, ()-> 0.0).withTimeout(1.0)
+        );
+    }
 }

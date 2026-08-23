@@ -159,7 +159,8 @@ public class DriveCommands {
               && DriverStation.getAlliance().get() == Alliance.Red;
 
           drive.runVelocity(
-              speeds
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+              speeds, drive.getRotation().unaryMinus())
           );
         },
         drive::stop
