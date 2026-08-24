@@ -31,6 +31,8 @@ import frc.robot.subsystems.drive.DriveCommands;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.MecanumSimIO;
 import frc.robot.subsystems.drive.NavXIO;
+import frc.robot.subsystems.manipulator.Manipulator;
+import frc.robot.subsystems.manipulator.ServoIO;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorMotorIO;
@@ -49,6 +51,7 @@ public class RobotContainer {
     private SparkMax testSparkMax;
     private Drive drive;
     private Elevator pivot;
+    private Manipulator manipulator;
 
     public RobotContainer() {
         buildRobot() ;
@@ -115,6 +118,7 @@ public class RobotContainer {
     private void buildComp() {
       drive= new Drive(new NavXIO());
       pivot= new Elevator(new ElevatorMotorIO(6, false, false));
+      manipulator= new Manipulator(new ServoIO(0));
     }
 
     private void createDefaultSubsystems() {
@@ -123,6 +127,9 @@ public class RobotContainer {
       }
       if(drive==null){
         drive= new Drive(new NavXIO());
+      }
+      if(manipulator==null){
+        manipulator= new Manipulator(new ServoIO(0));
       }
     }
 }
