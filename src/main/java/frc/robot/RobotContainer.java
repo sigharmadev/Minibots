@@ -78,8 +78,6 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-        gamepad_.a().onTrue(pivot.stowCommand());
-        gamepad_.x().onTrue(pivot.deployCommand());
       
     }
 
