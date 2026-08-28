@@ -1,85 +1,28 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
-import org.json.simple.parser.ParseException;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
+
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.Mode;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.MapleSimUtil;
+
 
 public class DriveCommands {
-  private static final double kStoppedVelocity = 0.15 ;
-
   private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 4.0;
-  private static final double ANGLE_KD = 0.0;
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 40.0;
-  private static final double FF_START_DELAY = 2.0; // Secs
-  private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private static Drive drive_;
   private static DoubleSupplier xSupplier_;
@@ -124,14 +67,18 @@ public class DriveCommands {
    * angular velocities). This is preconfigured with {@link #configure(Drive, DoubleSupplier, DoubleSupplier, DoubleSupplier)}
    */
   public static Command joystickDriveField() {
-    if (!configured) throw new IllegalStateException("DriveCommands joystickDrive called without first configuring!");
+    if (!configured) throw new IllegalStateException("DriveCommands joystickDriveField called without first configuring!");
     
     return joystickDriveField(drive_, xSupplier_, ySupplier_, omegaSupplier_);
   }
 
   /**
-   * Field relative drive command using two joysticks (controlling linear and
-   * angular velocities).
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   * @param drive
+   * @param xSupplier
+   * @param ySupplier
+   * @param omegaSupplier
+   * @return
    */
   public static Command joystickDriveField(
       Drive drive,
@@ -155,8 +102,6 @@ public class DriveCommands {
               linearVelocity.getY() * drive.getMaxLinearSpeed(),
               omega * drive.getMaxAngularSpeed());
               Logger.recordOutput("Omega/Supplier", omega);
-          boolean isFlipped = DriverStation.getAlliance().isPresent()
-              && DriverStation.getAlliance().get() == Alliance.Red;
 
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -168,11 +113,19 @@ public class DriveCommands {
   }
 
   public static Command joystickDriveRobot() {
-    if (!configured) throw new IllegalStateException("DriveCommands joystickDrive called without first configuring!");
+    if (!configured) throw new IllegalStateException("DriveCommands joystickDriveRobot called without first configuring!");
     
     return joystickDriveRobot(drive_, xSupplier_, ySupplier_, omegaSupplier_);
   }
-
+  /**
+   * Robot relative drive command using two joysticks (controlling linear and
+   * angular velocities).
+   * @param drive
+   * @param xSupplier
+   * @param ySupplier
+   * @param omegaSupplier
+   * @return
+   */
   public static Command joystickDriveRobot(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -195,8 +148,6 @@ public class DriveCommands {
               linearVelocity.getY() * drive.getMaxLinearSpeed(),
               omega * drive.getMaxAngularSpeed());
               Logger.recordOutput("Omega/Supplier", omega);
-          boolean isFlipped = DriverStation.getAlliance().isPresent()
-              && DriverStation.getAlliance().get() == Alliance.Red;
           
           drive.runVelocity(
             speeds
@@ -221,5 +172,25 @@ public class DriveCommands {
         DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
         return Commands.none();
     }
+  }
+
+  public static Command slowDriveField(
+    Drive drive,
+    DoubleSupplier xSupplier,
+    DoubleSupplier ySupplier,
+    DoubleSupplier omegaSupplier
+  ){
+    return drive.runEnd(()->{
+      ChassisSpeeds speed= new ChassisSpeeds(
+        xSupplier.getAsDouble() * drive.getMaxLinearSpeed(),
+        ySupplier.getAsDouble() * drive.getMaxLinearSpeed(),
+        omegaSupplier.getAsDouble() * drive.getMaxAngularSpeed()
+      );
+
+      drive.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(speed, 
+        drive.getRotation().unaryMinus())
+      );
+    }, drive::stop);
   }
 }

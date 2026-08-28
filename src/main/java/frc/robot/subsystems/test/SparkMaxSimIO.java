@@ -1,8 +1,5 @@
 package frc.robot.subsystems.test;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.sim.SparkMaxSim;
 

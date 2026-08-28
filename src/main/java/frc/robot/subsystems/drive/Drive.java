@@ -2,13 +2,6 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -17,8 +10,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,13 +23,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
-import frc.robot.subsystems.drive.GyroIO.GyroIOInputs;
 import frc.robot.util.LoggedTracer;
 
 
@@ -175,11 +164,6 @@ public class Drive extends SubsystemBase{
     mecanum[1].setSetpoint(wheelSpeeds.frontLeftMetersPerSecond);
     mecanum[2].setSetpoint(wheelSpeeds.rearLeftMetersPerSecond);
     mecanum[3].setSetpoint(wheelSpeeds.rearRightMetersPerSecond);
-
-    Logger.recordOutput("Setpoints/FrontRight", wheelSpeeds.frontRightMetersPerSecond);
-    Logger.recordOutput("Setpoints/FrontLeft", wheelSpeeds.frontLeftMetersPerSecond);
-    Logger.recordOutput("Setpoints/RearRight", wheelSpeeds.rearRightMetersPerSecond);
-    Logger.recordOutput("Setpoints/RearLeft", wheelSpeeds.rearLeftMetersPerSecond);
     
   }
 
@@ -208,22 +192,10 @@ public class Drive extends SubsystemBase{
     Logger.recordOutput("Omega/Discrete", discreteSpeeds.omegaRadiansPerSecond);
 
     wheelSpeeds.desaturate(MecanumConstants.maxWheelSpeedMetersPerSecond);
-
-    Logger.recordOutput("WheelSpeeds/FrontRight", wheelSpeeds.frontRightMetersPerSecond);
-    Logger.recordOutput("WheelSpeeds/FrontLeft", wheelSpeeds.frontLeftMetersPerSecond);
-    Logger.recordOutput("WheelSpeeds/BackLeft", wheelSpeeds.rearLeftMetersPerSecond);
-    Logger.recordOutput("WheelSpeeds/BackRight", wheelSpeeds.rearRightMetersPerSecond);
-    Logger.recordOutput("WheelSpeeds/MaxWheelMetersPerSecond", MecanumConstants.maxWheelSpeedMetersPerSecond);
-
     double frontRightAngular= 60.0*(wheelSpeeds.frontRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
     double frontLeftAngular= 60.0*(wheelSpeeds.frontLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
     double backLeftAngular= 60.0*(wheelSpeeds.rearLeftMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
     double backRightAngular= 60.0*(wheelSpeeds.rearRightMetersPerSecond/(MecanumConstants.wheelRadius))/(2.0*Math.PI);
-
-    Logger.recordOutput("WheelSpeeds/FrontRightAngular", frontRightAngular);
-    Logger.recordOutput("WheelSpeeds/FrontLeftAngular", frontLeftAngular);
-    Logger.recordOutput("WheelSpeeds/BackRightAngular", backRightAngular);
-    Logger.recordOutput("WheelSpeeds/BackLeftAngular", backLeftAngular);
 
 
     mecanum[0].duty((frontRightAngular/312)*1.0);

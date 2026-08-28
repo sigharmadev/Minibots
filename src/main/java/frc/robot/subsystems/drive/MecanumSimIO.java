@@ -6,8 +6,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.units.measure.Current;
-import static edu.wpi.first.units.Units.Amps;
+
 
 public class MecanumSimIO extends MecanumHardwareIO {
     private final DCMotorSim motorSim;

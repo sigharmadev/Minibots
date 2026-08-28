@@ -2,8 +2,6 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.Logger;
@@ -18,14 +16,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import edu.wpi.first.math.util.Units;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 
 public class MecanumHardwareIO implements MecanumIO {
     SparkMax motor;
     SparkClosedLoopController motorController;
     RelativeEncoder motorEncoder;
-    private AngularVelocity velocityDebug=RPM.of(0);
     private int inputsDebug= 0;
 
     public MecanumHardwareIO(int CanID, boolean motorInverted, boolean encoderInverted) {

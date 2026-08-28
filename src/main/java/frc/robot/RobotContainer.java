@@ -5,41 +5,18 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.FeetPerSecond;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
-import java.util.Arrays;
-
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.ctre.phoenix6.CANBus;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveCommands;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.MecanumSimIO;
 import frc.robot.subsystems.drive.NavXIO;
 import frc.robot.subsystems.manipulator.Manipulator;
 import frc.robot.subsystems.manipulator.ServoIO;
 import frc.robot.subsystems.Elevator.Elevator;
-import frc.robot.subsystems.Elevator.ElevatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorMotorIO;
 import frc.robot.subsystems.Elevator.ElevatorSimIO;
-import frc.robot.subsystems.test.MotorIOSparkMax;
-import frc.robot.subsystems.test.SparkMax;
-import frc.robot.subsystems.test.SparkMaxSimIO;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.RobotType;
 import frc.robot.commands.AutoCommands;
@@ -48,14 +25,13 @@ import frc.robot.util.MapleSimUtil;
 public class RobotContainer {
     private LoggedDashboardChooser<Command> autoChooser_ = new LoggedDashboardChooser<>("Auto choices");
     private final CommandXboxController gamepad_ = new CommandXboxController(0);
-    private SparkMax testSparkMax;
     private Drive drive;
-    private Elevator pivot;
+    private Elevator elevator;
     private Manipulator manipulator;
 
     public RobotContainer() {
-        buildRobot() ;
-        createDefaultSubsystems() ;
+        buildRobot();
+        createDefaultSubsystems();
         
         if (Constants.getRobot() == RobotType.SIMBOT) {
             MapleSimUtil.start();
@@ -78,13 +54,21 @@ public class RobotContainer {
     }
 
     private void configureBindings() {   
-      
+      gamepad_.x().onTrue(elevator.l3Place());
+      gamepad_.leftTrigger().and(gamepad_.rightTrigger()).onTrue(elevator.set(elevator.inputs.motorAngle-2.0));
+      gamepad_.rightTrigger().onTrue(elevator.reset());
     }
 
     private void configureDriveBindings(){
       drive.setDefaultCommand(DriveCommands.joystickDriveField().withName("JoystickDrive"));
       gamepad_.y().onTrue(drive.zeroGyro());
-      gamepad_.b().onTrue(drive.zeroPose());
+      gamepad_.povLeft().onTrue(drive.zeroPose());
+      
+      //Set of field relative commands to control the robot linearly at a slower speed
+      gamepad_.povUp().whileTrue(DriveCommands.slowDriveField(drive, ()->0.25, ()->0.0, ()->0.0));
+      gamepad_.povDown().whileTrue(DriveCommands.slowDriveField(drive, ()->-0.25, ()->0.0, ()->0.0));
+      gamepad_.povLeft().whileTrue(DriveCommands.slowDriveField(drive, ()->0.0, ()->0.25, ()->0.0));
+      gamepad_.povRight().whileTrue(DriveCommands.slowDriveField(drive, ()->0.0, ()->-0.25, ()->0.0));
     }
     
     public Command getAutonomousCommand() {
@@ -109,19 +93,18 @@ public class RobotContainer {
     }
 
     private void buildSimBot() {
-      drive= new Drive(new NavXIO());
-      pivot= new Elevator(new ElevatorSimIO(6, false, false));
+      elevator= new Elevator(new ElevatorSimIO(6, false, false));
     }
 
     private void buildComp() {
       drive= new Drive(new NavXIO());
-      pivot= new Elevator(new ElevatorMotorIO(6, false, false));
+      elevator= new Elevator(new ElevatorMotorIO(6, false, false));
       manipulator= new Manipulator(new ServoIO(0));
     }
 
     private void createDefaultSubsystems() {
-      if(pivot==null){
-        pivot= new Elevator(new ElevatorMotorIO(6, false, false));
+      if(elevator==null){
+        elevator= new Elevator(new ElevatorMotorIO(6, false, false));
       }
       if(drive==null){
         drive= new Drive(new NavXIO());

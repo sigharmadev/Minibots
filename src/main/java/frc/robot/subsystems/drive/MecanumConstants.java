@@ -1,9 +1,5 @@
 package frc.robot.subsystems.drive;
-
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.AngularVelocity;
 
 public class MecanumConstants {
     public static final int ENCODER_COUNTS_PER_REVOLUTION = 538;

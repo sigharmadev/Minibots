@@ -1,7 +1,6 @@
 package frc.robot.subsystems.manipulator;
 
 import edu.wpi.first.wpilibj.Servo;
-import frc.robot.subsystems.manipulator.ManipulatorIO.ManipulatorIOInputs;
 
 public class ServoIO implements ManipulatorIO {
     public Servo servo;

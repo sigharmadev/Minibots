@@ -1,12 +1,8 @@
 package frc.robot.subsystems.Elevator;
 
-import static edu.wpi.first.units.Units.RPM;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,19 +21,19 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
     }
 
-    public void deploy(){
-        io.setAngle(ElevatorConstants.deploySetpoint);
+    public void setAngle(double setpoint) {
+        io.setAngle(setpoint);
     }
 
-    public void stow(){
-        io.setAngle(60);
+    public Command l3Place(){
+        return Commands.runOnce(() -> setAngle(ElevatorConstants.l3));
     }
 
-    public Command deployCommand() {
-        return Commands.runOnce(this::deploy, this);
+    public Command reset(){
+        return Commands.runOnce(() -> setAngle(ElevatorConstants.reset));
     }
 
-    public Command stowCommand(){
-        return Commands.runOnce(this::stow, this);
+    public Command set(double setpoint){
+        return Commands.runOnce(() -> setAngle(setpoint));
     }
 }

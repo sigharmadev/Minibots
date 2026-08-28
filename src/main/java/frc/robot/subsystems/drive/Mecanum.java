@@ -1,14 +1,9 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,7 +24,7 @@ public class Mecanum extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Mecanum/" + name, inputs);
-        Logger.recordOutput("Velocity/Setpoint" + name, velocitySetpoint);
+        Logger.recordOutput("DriveSetpoints/Setpoint" + name, velocitySetpoint);
     }
 
     public void setVelocity(AngularVelocity velocity) {

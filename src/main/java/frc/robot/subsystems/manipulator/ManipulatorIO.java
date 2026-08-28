@@ -1,11 +1,6 @@
 package frc.robot.subsystems.manipulator;
-
-import static edu.wpi.first.units.Units.Degrees;
-
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.Servo;
 
 
 public interface ManipulatorIO {
